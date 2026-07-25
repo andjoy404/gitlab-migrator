@@ -1,0 +1,25 @@
+services:
+  gitlab-migrator:
+    image: ${GITLAB_MIGRATOR_IMAGE:-ghcr.io/andjoy404/gitlab-migrator:latest}
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    container_name: gitlab-migrator
+    command: ["sleep", "infinity"]
+    env_file:
+      - .env
+    environment:
+      GITLAB_MIGRATOR_OUTPUT_DIR: /data/output
+      GITLAB_MIGRATOR_WORKSPACE_DIR: /data/workspace
+    volumes:
+      - ./data/output:/data/output
+      - ./data/workspace:/data/workspace
+      - ./data/keys:/data/keys:ro
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true

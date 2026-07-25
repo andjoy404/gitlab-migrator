@@ -3,6 +3,8 @@
 /keys/
 /output/**
 /workspace/**
+/docker/.env
+/docker/data/**
 __pycache__/
 *.py[cod]
 *.egg-info/

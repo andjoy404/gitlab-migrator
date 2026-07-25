@@ -7,6 +7,21 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-26
+
+### Added
+
+- Add `migrate --yes` for reviewed, non-interactive repository migrations.
+- Add a non-root Docker image with Git, Git LFS, OpenSSH, and Skopeo.
+- Add persistent and detached Docker Compose execution workflows.
+- Add GHCR multi-platform image publishing for version tags.
+- Add focused installation, configuration, Docker, repository, runner,
+  pipeline, and container-registry guides.
+
+### Changed
+
+- Restructure the README as a concise project landing page.
+
 ## [0.2.0] - 2026-07-25
 
 ### Changed

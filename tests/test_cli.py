@@ -61,7 +61,19 @@ class CliTests(unittest.TestCase):
         args = cli.build_parser().parse_args(["migrate"])
 
         self.assertEqual(cli.dispatch(args), 0)
-        run.assert_called_once_with("migrate")
+        run.assert_called_once_with("migrate", None)
+
+    @patch("gitlab_migrator.cli.run_command")
+    def test_migrate_yes_is_forwarded_to_repository_phase(self, run):
+        run.side_effect = [0, 0]
+        args = cli.build_parser().parse_args(["migrate", "--yes"])
+
+        self.assertEqual(cli.dispatch(args), 0)
+        self.assertEqual(run.call_args_list[0].args, ("migrate", ["--yes"]))
+        self.assertEqual(
+            run.call_args_list[1].args,
+            ("migrate-merge-requests", ["--execute", "--days", "30"]),
+        )
 
     @patch("gitlab_migrator.cli.subprocess.run")
     def test_commands_run_as_installed_modules(self, run):

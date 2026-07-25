@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
 
@@ -70,15 +71,16 @@ if workers < 1:
 print(f"Workers     : {workers}")
 print()
 
-answer = input(
-    "Continue migration? (yes/no): "
-).strip().lower()
+if "--yes" not in sys.argv[1:]:
+    answer = input(
+        "Continue migration? (yes/no): "
+    ).strip().lower()
 
-if answer != "yes":
+    if answer != "yes":
 
-    print("Cancelled.")
+        print("Cancelled.")
 
-    raise SystemExit(USER_CANCELLED)
+        raise SystemExit(USER_CANCELLED)
 
 print()
 
