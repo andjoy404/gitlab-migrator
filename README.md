@@ -16,7 +16,6 @@ Most workflows resume from successful checkpoints after interruption.
 main.py                  Source-checkout compatibility launcher
 src/gitlab_migrator/     CLI, shared modules, and command implementations
 
-tools/                   Remote/local synchronization scripts
 keys/                    Runner SSH keys; never commit
 workspace/               Temporary repository mirrors; never commit
 output/                  Results, checkpoints, exports, and error logs
@@ -102,42 +101,6 @@ Run `gitlab-migrator --help` to list all commands:
 
 Deletion, cancellation, and retention commands are dry runs unless `--execute`
 is supplied.
-
-## Synchronize the code
-
-### Local to remote
-
-```bash
-./tools/sync_to_remote.sh deploy@example.com /apps/gitlab-migrator
-```
-
-Custom port and key:
-
-```bash
-REMOTE_SSH_KEY="$HOME/.ssh/remote.pem" \
-  ./tools/sync_to_remote.sh -p 2222 \
-  deploy@example.com /apps/gitlab-migrator
-```
-
-Uploads exclude `.env`, `keys/`, `.venv/`, `workspace/`, Python caches, and
-`output/`. The script does not use `--delete`.
-
-### Remote to local
-
-```bash
-./tools/sync_to_local.sh deploy@example.com
-```
-
-Custom remote path and port:
-
-```bash
-./tools/sync_to_local.sh -p 2222 \
-  deploy@example.com /other/path/gitlab-migrator
-```
-
-Downloads include `output/`, allowing the local checkout to receive results,
-checkpoints, and logs. Secrets, keys, virtual environments, repository
-workspaces, and Python caches remain excluded.
 
 ## Repositories and merge requests
 
@@ -330,9 +293,9 @@ garbage collection.
 
 | Workflow | Results/archive | Errors/progress |
 |---|---|---|
-| Repositories | ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â | `output/migration_errors.log` |
+| Repositories | N/A | `output/migration_errors.log` |
 | Merge requests | `output/merge_request_migration_results.json` | `output/merge_request_migration_errors.log` |
-| Runner export | `output/runners.json` | ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â |
+| Runner export | `output/runners.json` | N/A |
 | Runner deployment | `output/runner_deployment_results.json` | `output/runner_creation_errors.log`, `output/runner_ssh_errors.log` |
 | Pipeline export | `output/pipeline_history.json` | `output/pipeline_history_progress.json`, `output/pipeline_history_errors.log` |
 | Pipeline replay | `output/pipeline_replay_results.json` | `output/pipeline_history_errors.log` |

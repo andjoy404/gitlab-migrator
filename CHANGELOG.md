@@ -7,6 +7,22 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-07-25
+
+### Fixed
+
+- Replace corrupted README table characters with portable ASCII text.
+
+
+
+## [0.1.4] - 2026-07-25
+
+### Removed
+
+- Obsolete rsync synchronization helpers and their documentation.
+
+
+
 ## [0.1.3] - 2026-07-25
 
 ### Fixed
