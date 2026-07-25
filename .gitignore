@@ -1,0 +1,8 @@
+/.env
+/.venv/
+/keys/
+/output/
+/workspace/
+__pycache__/
+*.py[cod]
+*.egg-info/

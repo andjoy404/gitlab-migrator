@@ -1,0 +1,55 @@
+import os
+import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+from gitlab_migrator import cli
+
+
+class CliTests(unittest.TestCase):
+    def test_all_documented_commands_parse(self):
+        parser = cli.build_parser()
+        commands = [
+            "migrate", "migrate-merge-requests", "migrate-variables",
+            "migrate-group-variables", "migrate-hooks",
+            "migrate-protection", "export-runners",
+            "deploy-runners", "resume-runners", "export-pipelines",
+            "replay-pipelines", "migrate-registry",
+            "set-registry-retention", "purge-registry-images",
+            "cancel-pipelines",
+        ]
+        for command in commands:
+            with self.subTest(command=command):
+                self.assertEqual(parser.parse_args([command]).command, command)
+
+    def test_runtime_directories_are_exported_to_children(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = cli.build_parser().parse_args([
+                "--output-dir", directory,
+                "--workspace-dir", directory,
+                "export-runners",
+            ])
+            with patch.dict(os.environ, {}, clear=True):
+                cli.configure_runtime(args)
+                expected = str(Path(directory).resolve())
+                self.assertEqual(
+                    os.environ["GITLAB_MIGRATOR_OUTPUT_DIR"], expected
+                )
+                self.assertEqual(
+                    os.environ["GITLAB_MIGRATOR_WORKSPACE_DIR"], expected
+                )
+
+    @patch("gitlab_migrator.cli.subprocess.run")
+    def test_commands_run_as_installed_modules(self, run):
+        run.return_value.returncode = 0
+        self.assertEqual(cli.run_command("export-runners"), 0)
+        self.assertEqual(run.call_args.args[0][1:3], [
+            "-m", "gitlab_migrator.commands.export_runners"
+        ])
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+

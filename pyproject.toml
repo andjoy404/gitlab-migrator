@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gitlab-group-migrator"
+version = "0.1.0"
+description = "CLI tools for migrating projects and operational data between GitLab instances"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = ["GitPython", "python-dotenv", "requests", "rich"]
+
+[project.scripts]
+gitlab-migrator = "gitlab_migrator.cli:main"
+
+[tool.setuptools]
+packages = ["gitlab_migrator", "gitlab_migrator.commands"]
+package-dir = { "gitlab_migrator" = "src/gitlab_migrator", "gitlab_migrator.commands" = "scripts" }
