@@ -91,6 +91,34 @@ The six GitLab connection variables at the top are required. Registry
 credentials are needed only for container-registry commands; filters and
 runtime paths are optional. See [.env.example](.env.example) for descriptions.
 
+### Custom configuration and runtime locations
+
+By default, the command loads `.env` and creates `workspace/` and `output/`
+under the current directory. Override all three locations for one command by
+placing the global options before the subcommand:
+
+```bash
+gitlab-migrator \
+  --env-file "$HOME/.config/gitlab-migrator/production.env" \
+  --workspace-dir "$HOME/.local/share/gitlab-migrator/workspace" \
+  --output-dir "$HOME/.local/state/gitlab-migrator/output" \
+  migrate
+```
+
+To reuse the same locations in the current shell, export them once:
+
+```bash
+export GITLAB_MIGRATOR_ENV_FILE="$HOME/.config/gitlab-migrator/production.env"
+export GITLAB_MIGRATOR_WORKSPACE_DIR="$HOME/.local/share/gitlab-migrator/workspace"
+export GITLAB_MIGRATOR_OUTPUT_DIR="$HOME/.local/state/gitlab-migrator/output"
+
+gitlab-migrator migrate
+```
+
+Add those exports to `~/.bashrc` or `~/.zshrc` to apply them to future
+terminals. Explicit CLI options take precedence over exported variables, which
+take precedence over values loaded from `.env`.
+
 Never commit the resulting `.env`, `keys/`, `workspace/`, or `output/`.
 
 ## Command reference
@@ -354,4 +382,3 @@ sudo -n /usr/local/bin/gitlab-runner --version
 
 Permit `CI_PIPELINE_SOURCE == "api"` in the destination workflow and job rules
 before replaying.
-
