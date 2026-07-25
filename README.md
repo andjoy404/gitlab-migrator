@@ -23,7 +23,7 @@ output/                  Results, checkpoints, exports, and error logs
 Install the CLI directly from GitHub with `pipx`:
 
 ```bash
-pipx install git+https://github.com/OWNER/gitlab-migrator.git
+pipx install github.com/andjoy404/gitlab-migrator.git
 gitlab-migrator --help
 ```
 
