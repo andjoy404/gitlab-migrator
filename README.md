@@ -10,6 +10,10 @@ records, and container images from one GitLab instance to another.
 Generated exports, checkpoints, results, and error logs are stored in `output/`.
 Most workflows resume from successful checkpoints after interruption.
 
+## Visual quick start
+
+![GitLab Migrator install, configuration, verification, and usage walkthrough](docs/quick-start.gif)
+
 ## Project layout
 
 ```text
