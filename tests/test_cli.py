@@ -23,6 +23,20 @@ class CliTests(unittest.TestCase):
             with self.subTest(command=command):
                 self.assertEqual(parser.parse_args([command]).command, command)
 
+    def test_help_lists_commands_on_separate_lines(self):
+        help_text = cli.build_parser().format_help()
+
+        self.assertIn("COMMAND ...", help_text)
+        self.assertNotIn("{migrate,migrate-merge-requests", help_text)
+        self.assertIn(
+            "migrate             Migrate repositories and recent merge requests.",
+            help_text,
+        )
+        self.assertIn(
+            "export-runners      Export source runner details.",
+            help_text,
+        )
+
     def test_runtime_directories_are_exported_to_children(self):
         with tempfile.TemporaryDirectory() as directory:
             args = cli.build_parser().parse_args([
@@ -51,5 +65,3 @@ class CliTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-

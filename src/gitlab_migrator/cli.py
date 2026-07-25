@@ -6,6 +6,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from . import __version__
+
 
 MODULES = {
     "migrate": "gitlab_migrator.commands.migrate",
@@ -38,7 +40,9 @@ def add_runtime_options(parser):
     parser.add_argument("--env-file")
     parser.add_argument("--output-dir")
     parser.add_argument("--workspace-dir")
-    parser.add_argument("--version", action="version", version="%(prog)s 0.1.0")
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {__version__}"
+    )
 
 
 def build_parser():

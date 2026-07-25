@@ -7,6 +7,16 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-07-25
+
+### Changed
+
+- Display CLI commands on separate lines in top-level help.
+- Generalize local/remote synchronization tools.
+- Package command modules under `src/gitlab_migrator/commands`.
+
+
+
 ### Added
 
 - Installable `gitlab-migrator` command.
