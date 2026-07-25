@@ -8,11 +8,30 @@ version = "0.1.0"
 description = "CLI tools for migrating projects and operational data between GitLab instances"
 readme = "README.md"
 requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "andjoy404" }]
 dependencies = ["GitPython", "python-dotenv", "requests", "rich"]
+keywords = ["gitlab", "migration", "devops", "cli"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Version Control :: Git",
+]
 
 [project.scripts]
 gitlab-migrator = "gitlab_migrator.cli:main"
 
+[project.urls]
+Homepage = "https://github.com/andjoy404/gitlab-migrator"
+Repository = "https://github.com/andjoy404/gitlab-migrator.git"
+Issues = "https://github.com/andjoy404/gitlab-migrator/issues"
+Changelog = "https://github.com/andjoy404/gitlab-migrator/blob/main/CHANGELOG.md"
+
 [tool.setuptools]
-packages = ["gitlab_migrator", "gitlab_migrator.commands"]
-package-dir = { "gitlab_migrator" = "src/gitlab_migrator", "gitlab_migrator.commands" = "scripts" }
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]

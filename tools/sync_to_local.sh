@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Pull the migrator source from an H200 host into this local checkout.
+# Pull the migrator source from a remote host into this local checkout.
 
 set -euo pipefail
 
-ssh_port=${H200_SSH_PORT:-22}
+ssh_port=${REMOTE_SSH_PORT:-22}
 
 usage() {
-  echo "Usage: $0 [-p ssh-port] user@h200-host [source-path]" >&2
+  echo "Usage: $0 [-p ssh-port] user@remote-host [source-path]" >&2
 }
 
 while getopts ":p:" option; do
@@ -23,7 +23,7 @@ shift $((OPTIND - 1))
 
 if [[ $# -lt 1 || $# -gt 2 ]]; then
   usage
-  echo "Example: $0 -p 2222 afxsvr01@afxh200svr01 /apps/gitlab-migrator" >&2
+  echo "Example: $0 -p 2222 deploy@example.com /apps/gitlab-migrator" >&2
   exit 2
 fi
 
@@ -33,8 +33,8 @@ project_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 
 ssh_command=(ssh -p "$ssh_port")
 
-if [[ -n ${H200_SSH_KEY:-} ]]; then
-  ssh_command+=(-i "$H200_SSH_KEY")
+if [[ -n ${REMOTE_SSH_KEY:-} ]]; then
+  ssh_command+=(-i "$REMOTE_SSH_KEY")
 fi
 
 rsync \

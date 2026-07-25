@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 def configure_import_path():
-    source_root = Path(__file__).resolve().parents[1] / "src"
+    source_root = Path(__file__).resolve().parents[2]
     source_root_text = str(source_root)
 
     if source_root_text not in sys.path:
