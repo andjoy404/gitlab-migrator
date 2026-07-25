@@ -37,6 +37,18 @@ The SSH form also works when your GitHub SSH key is configured:
 pipx install git+ssh://git@github.com/andjoy404/gitlab-migrator.git
 ```
 
+Upgrade an existing installation after a new release:
+
+```bash
+pipx upgrade gitlab-group-migrator
+```
+
+If pipx cannot detect the new GitHub revision, force a reinstall:
+
+```bash
+pipx install --force git+https://github.com/andjoy404/gitlab-migrator.git
+```
+
 For local development:
 
 ```bash
@@ -318,9 +330,9 @@ garbage collection.
 
 | Workflow | Results/archive | Errors/progress |
 |---|---|---|
-| Repositories | ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â | `output/migration_errors.log` |
+| Repositories | ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â | `output/migration_errors.log` |
 | Merge requests | `output/merge_request_migration_results.json` | `output/merge_request_migration_errors.log` |
-| Runner export | `output/runners.json` | ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â |
+| Runner export | `output/runners.json` | ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â |
 | Runner deployment | `output/runner_deployment_results.json` | `output/runner_creation_errors.log`, `output/runner_ssh_errors.log` |
 | Pipeline export | `output/pipeline_history.json` | `output/pipeline_history_progress.json`, `output/pipeline_history_errors.log` |
 | Pipeline replay | `output/pipeline_replay_results.json` | `output/pipeline_history_errors.log` |
