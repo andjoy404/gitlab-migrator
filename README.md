@@ -39,13 +39,30 @@ pipx install git+ssh://git@github.com/andjoy404/gitlab-migrator.git
 Upgrade an existing installation after a new release:
 
 ```bash
-pipx upgrade gitlab-group-migrator
+pipx upgrade gitlab-migrator
 ```
 
 If pipx cannot detect the new GitHub revision, force a reinstall:
 
 ```bash
 pipx install --force git+https://github.com/andjoy404/gitlab-migrator.git
+```
+
+### Migrating from version 0.1.x
+
+The distribution was renamed from `gitlab-group-migrator` to
+`gitlab-migrator` in version 0.2.0. Remove the old pipx package once, then
+install the renamed package:
+
+```bash
+pipx uninstall gitlab-group-migrator
+pipx install git+https://github.com/andjoy404/gitlab-migrator.git
+```
+
+Future upgrades use the same name as the executable:
+
+```bash
+pipx upgrade gitlab-migrator
 ```
 
 For local development:

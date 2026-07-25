@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-25
+
+### Changed
+
+- Rename the Python distribution from `gitlab-group-migrator` to
+  `gitlab-migrator`, matching the repository and executable names.
+
+
+
 ## [0.1.5] - 2026-07-25
 
 ### Fixed
