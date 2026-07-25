@@ -80,7 +80,6 @@ A ready-to-use image contains Git, Git LFS, OpenSSH, and Skopeo:
 
 ```bash
 cp docker/.env.example docker/.env
-mkdir -p docker/data/output docker/data/workspace docker/data/keys
 docker compose -f docker/docker-compose.yml pull
 docker compose -f docker/docker-compose.yml up -d
 docker exec -it gitlab-migrator gitlab-migrator migrate

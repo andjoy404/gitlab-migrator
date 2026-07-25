@@ -75,13 +75,25 @@ class CliTests(unittest.TestCase):
             ("migrate-merge-requests", ["--execute", "--days", "30"]),
         )
 
-    @patch("gitlab_migrator.cli.subprocess.run")
+    @patch("gitlab_migrator.cli.subprocess.Popen")
     def test_commands_run_as_installed_modules(self, run):
-        run.return_value.returncode = 0
+        run.return_value.wait.return_value = 0
         self.assertEqual(cli.run_command("export-runners"), 0)
         self.assertEqual(run.call_args.args[0][1:3], [
             "-m", "gitlab_migrator.commands.export_runners"
         ])
+
+    @patch("gitlab_migrator.cli.os.killpg")
+    @patch("gitlab_migrator.cli.subprocess.Popen")
+    def test_keyboard_interrupt_stops_child_without_traceback(self, popen, killpg):
+        process = popen.return_value
+        process.pid = 1234
+        process.wait.side_effect = [KeyboardInterrupt, 0]
+
+        with patch("gitlab_migrator.cli.os.name", "posix"):
+            self.assertEqual(cli.run_command("export-runners"), 130)
+
+        killpg.assert_called_once()
 
 
 if __name__ == "__main__":

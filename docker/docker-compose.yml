@@ -1,4 +1,24 @@
 services:
+  init-permissions:
+    image: ${GITLAB_MIGRATOR_IMAGE:-ghcr.io/andjoy404/gitlab-migrator:latest}
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    user: "0:0"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        chown -R ${USER_ID:-1000}:${GROUP_ID:-1000}
+        /data/output /data/workspace /data/keys
+    volumes:
+      - ./data/output:/data/output
+      - ./data/workspace:/data/workspace
+      - ./data/keys:/data/keys
+    restart: "no"
+
   gitlab-migrator:
     image: ${GITLAB_MIGRATOR_IMAGE:-ghcr.io/andjoy404/gitlab-migrator:latest}
     build:
@@ -8,6 +28,10 @@ services:
         USER_ID: ${USER_ID:-1000}
         GROUP_ID: ${GROUP_ID:-1000}
     container_name: gitlab-migrator
+    user: "${USER_ID:-1000}:${GROUP_ID:-1000}"
+    depends_on:
+      init-permissions:
+        condition: service_completed_successfully
     command: ["sleep", "infinity"]
     env_file:
       - .env

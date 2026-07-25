@@ -6,7 +6,6 @@ The image includes Git, Git LFS, OpenSSH, and Skopeo. It runs as an unprivileged
 
 ```bash
 cp docker/.env.example docker/.env
-mkdir -p docker/data/output docker/data/workspace docker/data/keys
 ```
 
 Edit `docker/.env`, then make it private:
@@ -15,7 +14,9 @@ Edit `docker/.env`, then make it private:
 chmod 600 docker/.env
 ```
 
-Runner SSH keys belong in `docker/data/keys`; the container mounts that directory read-only.
+Runner SSH keys belong in docker/data/keys; the container mounts that directory read-only.
+Compose creates the runtime directories and a short-lived initialization service
+assigns them to USER_ID and GROUP_ID before the migrator starts.
 
 ## Use the GHCR image
 

@@ -462,7 +462,7 @@ def mirror(
     )
 
     print(
-        f"âœ“ {repo.name} synchronized"
+        f"[OK] {repo.name} synchronized"
     )
 
 

@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Initialize Docker bind-mounted data directories with the configured host
+  user and group ownership before starting the migrator container.
+- Replace the corrupted repository synchronization symbol with a portable
+  ASCII status marker.
+- Handle Ctrl+C in the command launcher without printing parent and child
+  Python tracebacks.
+
 ## [0.3.0] - 2026-07-26
 
 ### Added

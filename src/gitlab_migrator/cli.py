@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import signal
 import subprocess
 import sys
 from pathlib import Path
@@ -34,7 +35,24 @@ def output_dir():
 def run_command(name, arguments=None):
     command = [sys.executable, "-m", MODULES[name]]
     command.extend(arguments or [])
-    return subprocess.run(command).returncode
+    process = subprocess.Popen(
+        command,
+        start_new_session=os.name == "posix",
+    )
+    try:
+        return process.wait()
+    except KeyboardInterrupt:
+        print("\nCancelled by user.", file=sys.stderr)
+        if os.name == "posix":
+            os.killpg(process.pid, signal.SIGTERM)
+        else:
+            process.terminate()
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait()
+        return 130
 
 
 def add_runtime_options(parser):
