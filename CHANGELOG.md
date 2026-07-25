@@ -7,6 +7,23 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-07-25
+
+### Fixed
+
+- Stop the combined migration when repository migration is cancelled.
+
+
+
+## [0.1.2] - 2026-07-25
+
+### Fixed
+
+- Load `.env` from the current working directory for pipx installations.
+- Report the configuration file path when required variables are missing.
+
+
+
 ## [0.1.1] - 2026-07-25
 
 ### Changed

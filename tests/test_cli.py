@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from gitlab_migrator import cli
+from gitlab_migrator.constants import USER_CANCELLED
 
 
 class CliTests(unittest.TestCase):
@@ -53,6 +54,14 @@ class CliTests(unittest.TestCase):
                 self.assertEqual(
                     os.environ["GITLAB_MIGRATOR_WORKSPACE_DIR"], expected
                 )
+
+    @patch("gitlab_migrator.cli.run_command")
+    def test_cancelled_repository_migration_stops_second_phase(self, run):
+        run.return_value = USER_CANCELLED
+        args = cli.build_parser().parse_args(["migrate"])
+
+        self.assertEqual(cli.dispatch(args), 0)
+        run.assert_called_once_with("migrate")
 
     @patch("gitlab_migrator.cli.subprocess.run")
     def test_commands_run_as_installed_modules(self, run):

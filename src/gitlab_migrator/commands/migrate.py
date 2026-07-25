@@ -12,6 +12,7 @@ except ImportError:
 configure_import_path()
 
 from gitlab_migrator.config import *
+from gitlab_migrator.constants import USER_CANCELLED
 
 validate()
 
@@ -77,7 +78,7 @@ if answer != "yes":
 
     print("Cancelled.")
 
-    raise SystemExit(0)
+    raise SystemExit(USER_CANCELLED)
 
 print()
 

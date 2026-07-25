@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from . import __version__
+from .constants import USER_CANCELLED
 
 
 MODULES = {
@@ -119,6 +120,8 @@ def optional_flags(args, pairs):
 def dispatch(args):
     if args.command == "migrate":
         result = run_command("migrate")
+        if result == USER_CANCELLED:
+            return 0
         if result:
             return result
         arguments = ["--execute", "--days", str(args.days)]
