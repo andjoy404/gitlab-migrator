@@ -7,6 +7,11 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Add resumable repository migration checkpoints and `migrate --reset` for an
+  intentional full repository replay.
+
 ### Fixed
 
 - Initialize Docker bind-mounted data directories with the configured host

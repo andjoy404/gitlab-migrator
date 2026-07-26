@@ -75,6 +75,11 @@ def build_parser():
     migrate.add_argument("--days", type=float, default=30)
     migrate.add_argument("--reset-merge-requests", action="store_true")
     migrate.add_argument(
+        "--reset",
+        action="store_true",
+        help="Clear repository checkpoints and migrate every repository again.",
+    )
+    migrate.add_argument(
         "--yes",
         action="store_true",
         help="Skip the source and destination confirmation prompt.",
@@ -142,8 +147,12 @@ def optional_flags(args, pairs):
 
 def dispatch(args):
     if args.command == "migrate":
-        repository_arguments = ["--yes"] if args.yes else None
-        result = run_command("migrate", repository_arguments)
+        repository_arguments = []
+        if args.yes:
+            repository_arguments.append("--yes")
+        if args.reset:
+            repository_arguments.append("--reset")
+        result = run_command("migrate", repository_arguments or None)
         if result == USER_CANCELLED:
             return 0
         if result:

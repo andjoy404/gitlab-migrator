@@ -66,11 +66,11 @@ Run `gitlab-migrator COMMAND --help` for command-specific options.
 
 | Area | Commands |
 | --- | --- |
-| Repositories | `migrate`, `migrate-merge-requests` |
-| GitLab metadata | `migrate-variables`, `migrate-group-variables`, `migrate-hooks`, `migrate-protection` |
-| Runners | `export-runners`, `deploy-runners`, `resume-runners` |
-| Pipelines | `export-pipelines`, `replay-pipelines`, `cancel-pipelines` |
-| Registry | `migrate-registry`, `set-registry-retention`, `purge-registry-images` |
+| Repositories | `migrate`<br>`migrate-merge-requests` |
+| GitLab metadata | `migrate-variables`<br>`migrate-group-variables`<br>`migrate-hooks`<br>`migrate-protection` |
+| Runners | `export-runners`<br>`deploy-runners`<br>`resume-runners` |
+| Pipelines | `export-pipelines`<br>`replay-pipelines`<br>`cancel-pipelines` |
+| Registry | `migrate-registry`<br>`set-registry-retention`<br>`purge-registry-images` |
 
 Commands that can remove or cancel data use preview/dry-run behavior unless their help explicitly requires `--execute`. Always review the preview.
 

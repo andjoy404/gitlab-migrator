@@ -75,6 +75,14 @@ class CliTests(unittest.TestCase):
             ("migrate-merge-requests", ["--execute", "--days", "30"]),
         )
 
+    @patch("gitlab_migrator.cli.run_command")
+    def test_migrate_reset_is_forwarded_to_repository_phase(self, run):
+        run.side_effect = [0, 0]
+        args = cli.build_parser().parse_args(["migrate", "--reset"])
+
+        self.assertEqual(cli.dispatch(args), 0)
+        self.assertEqual(run.call_args_list[0].args, ("migrate", ["--reset"]))
+
     @patch("gitlab_migrator.cli.subprocess.Popen")
     def test_commands_run_as_installed_modules(self, run):
         run.return_value.wait.return_value = 0

@@ -14,7 +14,10 @@ For reviewed automation, skip only that confirmation:
 gitlab-migrator migrate --yes
 ```
 
-Repository mirrors run first. Recent merge requests are then recreated for the configured time window:
+Repository mirrors run first. Every successful repository is immediately saved to
+`output/repository_migration_results.json`. If the command is stopped, run the
+same command again; completed repositories are skipped and unfinished ones retry.
+Recent merge requests are then recreated for the configured time window:
 
 ```bash
 gitlab-migrator migrate --days 90
@@ -44,7 +47,19 @@ Increase `MIGRATE_WORKERS` cautiously; Git operations, GitLab rate limits, and d
 gitlab-migrator migrate-merge-requests --days 30
 ```
 
-Reset its checkpoint when intentionally rebuilding the migration result:
+Restart all repository mirrors intentionally:
+
+```bash
+gitlab-migrator migrate --reset
+```
+
+This resets repository checkpoints only. To reset recent merge requests too:
+
+```bash
+gitlab-migrator migrate --reset --reset-merge-requests
+```
+
+Reset the merge-request-only checkpoint when intentionally rebuilding its result:
 
 ```bash
 gitlab-migrator migrate-merge-requests --days 30 --reset

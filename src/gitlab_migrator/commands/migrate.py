@@ -3,6 +3,7 @@
 import os
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from threading import Lock
 
 try:
@@ -21,6 +22,10 @@ from gitlab_migrator.gitlab_api import GitLabAPI
 from gitlab_migrator.namespace import NamespaceManager
 from gitlab_migrator.mirror import mirror
 from gitlab_migrator.paths import output_path
+from gitlab_migrator.repository_progress import (
+    load_repository_progress,
+    save_repository_progress,
+)
 
 from gitlab_migrator.migrate_protected_branches import (
     migrate_protected_branches,
@@ -46,6 +51,15 @@ namespace = NamespaceManager(
     DEST_ROOT_GROUP,
 )
 namespace_lock = Lock()
+results_lock = Lock()
+results_file = output_path("repository_migration_results.json")
+migration_context = {
+    "source_url": SOURCE_URL.rstrip("/"),
+    "source_group": SOURCE_GROUP.strip("/"),
+    "destination_url": DEST_URL.rstrip("/"),
+    "destination_root_group": DEST_ROOT_GROUP.strip("/"),
+}
+
 
 # ==========================================================
 # START
@@ -84,9 +98,20 @@ if "--yes" not in sys.argv[1:]:
 
 print()
 
+repository_results = load_repository_progress(
+    results_file,
+    migration_context,
+    reset="--reset" in sys.argv[1:],
+)
+completed_paths = {
+    result["source_path"]
+    for result in repository_results
+    if result.get("status") == "completed" and result.get("source_path")
+}
 # ==========================================================
 # PROJECTS
 # ==========================================================
+
 
 projects = src.list_projects(
     SOURCE_GROUP
@@ -144,9 +169,22 @@ elif group_filter:
 
     print(f"Syncing only group: {group_filter}")
 
+discovered_total = len(projects)
+projects = [
+    project
+    for project in projects
+    if project["path_with_namespace"] not in completed_paths
+]
+previously_completed = discovered_total - len(projects)
 total = len(projects)
 
-print(f"Found {total} projects.")
+print(f"Found {discovered_total} projects.")
+if previously_completed:
+    print(
+        f"Skipping {previously_completed} previously completed repositories "
+        f"from {results_file}."
+    )
+print(f"Repositories remaining: {total}")
 print()
 
 success = 0
@@ -211,7 +249,23 @@ def migrate_project(index, project):
                 protections,
             )
 
-        print(f"Completed: {project['path_with_namespace']}")
+        with results_lock:
+            repository_results.append({
+                "source_path": project["path_with_namespace"],
+                "destination_path": destination_path,
+                "status": "completed",
+                "completed_at": datetime.now(timezone.utc).isoformat(),
+            })
+            save_repository_progress(
+                results_file,
+                migration_context,
+                repository_results,
+            )
+
+        print(
+            f"Completed: {project['path_with_namespace']} "
+            "(checkpoint saved)"
+        )
         print()
         return None
 
@@ -252,6 +306,7 @@ print("=" * 70)
 
 print(f"Total     : {total}")
 print(f"Success   : {success}")
+print(f"Skipped   : {previously_completed}")
 print(f"Failed    : {failed}")
 
 if errors:

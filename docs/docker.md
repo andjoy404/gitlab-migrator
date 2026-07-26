@@ -60,7 +60,7 @@ Interactive repository migration:
 docker exec -it gitlab-migrator gitlab-migrator migrate
 ```
 
-Detached migration without the initial confirmation:
+Detached migration without the initial confirmation (recommended for long runs):
 
 ```bash
 docker compose -f docker/docker-compose.yml run -d \
@@ -69,6 +69,11 @@ docker compose -f docker/docker-compose.yml run -d \
 
 docker logs -f gitlab-migrator-job
 ```
+
+You may close the log viewer with Ctrl+C without stopping the detached job.
+Reattach later with the same `docker logs -f` command. Successful repositories
+are checkpointed in the mounted output directory, so a stopped job can be rerun
+without starting over.
 
 Inspect the exit status and remove the completed job:
 
