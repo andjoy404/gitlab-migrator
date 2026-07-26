@@ -6,6 +6,10 @@
 !/data/repositories/.gitkeep
 !/data/reports/.gitkeep
 !/data/keys/.gitkeep
+# Ignore data left by installations configured with the pre-0.4 paths.
+/workspace/**
+/output/**
+/keys/**
 /docker/.env
 __pycache__/
 *.py[cod]
