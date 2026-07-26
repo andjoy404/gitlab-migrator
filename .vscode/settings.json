@@ -1,0 +1,8 @@
+{
+  "git.repositoryScanIgnoredFolders": [
+    "data/repositories"
+  ],
+  "files.watcherExclude": {
+    "**/data/repositories/**": true
+  }
+}
