@@ -7,6 +7,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+from rich.console import Console, Group
+from rich.panel import Panel
+from rich.text import Text
+
 from . import __version__
 from .constants import USER_CANCELLED
 
@@ -26,6 +30,32 @@ MODULES = {
     "purge-registry-images": "gitlab_migrator.commands.purge_registry_images",
     "cancel-pipelines": "gitlab_migrator.commands.cancel_pipelines",
 }
+
+
+def print_banner():
+    """Print the product banner; Rich removes color for redirected output."""
+
+    title = Text()
+    title.append("GitLab", style="bold #FC6D26")
+    title.append(" Migrator", style="bold bright_cyan")
+    title.append(f"  v{__version__}", style="dim bright_green")
+
+    capabilities = Text()
+    capabilities.append("Repositories", style="cyan")
+    capabilities.append("  •  ", style="dim")
+    capabilities.append("Metadata", style="magenta")
+    capabilities.append("  •  ", style="dim")
+    capabilities.append("Runners", style="yellow")
+    capabilities.append("  •  ", style="dim")
+    capabilities.append("Pipelines", style="green")
+    capabilities.append("  •  ", style="dim")
+    capabilities.append("Registry", style="bright_blue")
+
+    Console().print(Panel.fit(
+        Group(title, capabilities),
+        border_style="bright_magenta",
+        padding=(0, 2),
+    ))
 
 
 def output_dir():
@@ -359,6 +389,10 @@ def dispatch(args):
 
 
 def main():
+    # Keep redirected `--version` output machine-readable while giving an
+    # interactive terminal the same branded experience as other commands.
+    if "--version" not in sys.argv[1:] or sys.stdout.isatty():
+        print_banner()
     args = build_parser().parse_args()
     configure_runtime(args)
     if args.command is None:
@@ -367,3 +401,7 @@ def main():
     if not getattr(args, "dispatch_command", None):
         build_parser().parse_args([args.command, "--help"])
     return dispatch(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -8,12 +8,66 @@ from PIL import Image, ImageDraw, ImageFont
 WIDTH, HEIGHT = 1200, 650
 ROOT = Path(__file__).resolve().parent
 OUTPUT = ROOT / "quick-start.gif"
-MONO = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+
+
+def first_font(*candidates):
+    for candidate in candidates:
+        if Path(candidate).is_file():
+            return candidate
+    raise RuntimeError(f"None of these fonts are installed: {candidates}")
+
+
+MONO = first_font(
+    "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+    "/System/Library/Fonts/SFNSMono.ttf",
+    "/System/Library/Fonts/Menlo.ttc",
+)
+BOLD = first_font(
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+)
 FONT = ImageFont.truetype(MONO, 25)
 SMALL = ImageFont.truetype(MONO, 20)
-TITLE = ImageFont.truetype(
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 34
-)
+TITLE = ImageFont.truetype(BOLD, 34)
+
+
+def draw_segments(draw, position, segments):
+    x, y = position
+    for text, color in segments:
+        draw.text((x, y), text, font=FONT, fill=color)
+        x += draw.textlength(text, font=FONT)
+
+
+def draw_terminal_line(draw, position, kind, text):
+    colors = {
+        "prompt": "#86efac",
+        "muted": "#8295ad",
+        "banner_border": "#e879f9",
+    }
+    if kind == "banner_title":
+        draw_segments(draw, position, [
+            ("│  ", "#e879f9"),
+            ("GitLab", "#fc6d26"),
+            (" Migrator", "#67e8f9"),
+            ("  v0.5.1", "#4ade80"),
+            ("                                           │", "#e879f9"),
+        ])
+    elif kind == "banner_caps":
+        draw_segments(draw, position, [
+            ("│  ", "#e879f9"),
+            ("Repositories", "#22d3ee"),
+            ("  •  ", "#8295ad"),
+            ("Metadata", "#e879f9"),
+            ("  •  ", "#8295ad"),
+            ("Runners", "#fde047"),
+            ("  •  ", "#8295ad"),
+            ("Pipelines", "#4ade80"),
+            ("  •  ", "#8295ad"),
+            ("Registry", "#60a5fa"),
+            ("  │", "#e879f9"),
+        ])
+    else:
+        draw.text(position, text, font=FONT, fill=colors.get(kind, "#8295ad"))
 
 
 def draw_frame(lines, active=""):
@@ -30,10 +84,10 @@ def draw_frame(lines, active=""):
     for x, color in ((76, "#fb7185"), (100, "#facc15"), (124, "#4ade80")):
         draw.ellipse((x, 148, x + 14, 162), fill=color)
 
+    visible_lines = lines[-8:]
     y = 198
-    for kind, text in lines:
-        color = "#86efac" if kind == "prompt" else "#8295ad"
-        draw.text((82, y), text, font=FONT, fill=color)
+    for kind, text in visible_lines:
+        draw_terminal_line(draw, (82, y), kind, text)
         y += 43
 
     if active:
@@ -59,7 +113,16 @@ def main():
         ),
         ("$ cp .env.example .env", None),
         ("$ $EDITOR .env", "# Add source and destination settings"),
-        ("$ gitlab-migrator --version", "gitlab-migrator 0.5.0"),
+        (
+            "$ gitlab-migrator --version",
+            [
+                ("banner_border", "╭────────────────────────────────────────────────────────────────────╮"),
+                ("banner_title", ""),
+                ("banner_caps", ""),
+                ("banner_border", "╰────────────────────────────────────────────────────────────────────╯"),
+                ("muted", "gitlab-migrator 0.5.1"),
+            ],
+        ),
         ("$ gitlab-migrator migrate all", "Continue migration? (yes/no):"),
     ]
     frames, durations, lines = [], [], []
@@ -72,7 +135,10 @@ def main():
         durations.append(700)
         lines.append(("prompt", command))
         if response:
-            lines.append(("muted", response))
+            if isinstance(response, list):
+                lines.extend(response)
+            else:
+                lines.append(("muted", response))
             frames.append(draw_frame(lines))
             durations.append(900)
 

@@ -7,6 +7,18 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-07-27
+
+### Added
+
+- Add a colorful Rich banner to interactive CLI output, including interactive
+  `--version`, while keeping redirected version output machine-readable.
+
+### Changed
+
+- Refresh the quick-start animation with the CLI banner and make its renderer
+  portable across macOS and Linux system fonts.
+
 ## [0.5.0] - 2026-07-27
 
 ### Added

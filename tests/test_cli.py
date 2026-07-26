@@ -1,6 +1,7 @@
 import os
 import tempfile
 import unittest
+from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
@@ -9,6 +10,40 @@ from gitlab_migrator.constants import USER_CANCELLED
 
 
 class CliTests(unittest.TestCase):
+    def test_banner_contains_product_version_and_capabilities(self):
+        output = StringIO()
+        console = cli.Console(file=output, force_terminal=False, width=100)
+        with patch("gitlab_migrator.cli.Console", return_value=console):
+            cli.print_banner()
+
+        rendered = output.getvalue()
+        self.assertIn("GitLab Migrator", rendered)
+        self.assertIn(cli.__version__, rendered)
+        self.assertIn("Repositories", rendered)
+        self.assertIn("Registry", rendered)
+
+    @patch("gitlab_migrator.cli.build_parser")
+    @patch("gitlab_migrator.cli.print_banner")
+    def test_interactive_version_shows_banner(self, banner, build_parser):
+        build_parser.return_value.parse_args.side_effect = SystemExit(0)
+        with patch("gitlab_migrator.cli.sys.argv", ["gitlab-migrator", "--version"]):
+            with patch("gitlab_migrator.cli.sys.stdout.isatty", return_value=True):
+                with self.assertRaises(SystemExit):
+                    cli.main()
+
+        banner.assert_called_once_with()
+
+    @patch("gitlab_migrator.cli.build_parser")
+    @patch("gitlab_migrator.cli.print_banner")
+    def test_redirected_version_stays_machine_readable(self, banner, build_parser):
+        build_parser.return_value.parse_args.side_effect = SystemExit(0)
+        with patch("gitlab_migrator.cli.sys.argv", ["gitlab-migrator", "--version"]):
+            with patch("gitlab_migrator.cli.sys.stdout.isatty", return_value=False):
+                with self.assertRaises(SystemExit):
+                    cli.main()
+
+        banner.assert_not_called()
+
     def test_grouped_commands_map_to_existing_operations(self):
         parser = cli.build_parser()
         commands = {
