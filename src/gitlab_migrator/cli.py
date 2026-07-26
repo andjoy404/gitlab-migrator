@@ -64,6 +64,81 @@ def add_runtime_options(parser):
     )
 
 
+def add_migrate_all_options(parser):
+    parser.add_argument("--days", type=float, default=30)
+    parser.add_argument(
+        "--reset-mr",
+        "--reset-merge-requests",
+        dest="reset_merge_requests",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--reset",
+        action="store_true",
+        help="Clear repository checkpoints and migrate every repository again.",
+    )
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="Skip the source and destination confirmation prompt.",
+    )
+
+
+def add_migrate_mr_options(parser):
+    parser.add_argument("--days", type=float, default=30)
+    parser.add_argument("--reset", action="store_true")
+
+
+def add_runner_deploy_options(parser):
+    parser.add_argument("--plan")
+    parser.add_argument("--keys-dir")
+    parser.add_argument("--port", type=int, default=22)
+
+
+def add_pipeline_export_options(parser):
+    parser.add_argument("--days", type=float, default=30)
+    parser.add_argument("--reset", action="store_true")
+
+
+def add_pipeline_replay_options(parser):
+    parser.add_argument("--file")
+    parser.add_argument("--all-records", action="store_true")
+
+
+def add_pipeline_cancel_options(parser):
+    parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--project")
+    parser.add_argument("--hours", type=float, default=24)
+    parser.add_argument("--include-manual", action="store_true")
+
+
+def add_registry_migrate_options(parser):
+    parser.add_argument("--days", type=float, default=30)
+    parser.add_argument("--reset", action="store_true")
+
+
+def add_registry_retention_options(parser):
+    parser.add_argument("--day", "--days", dest="days", type=int, default=7)
+    parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--project")
+    parser.add_argument("--reset", action="store_true")
+
+
+def add_registry_purge_options(parser):
+    parser.add_argument("--days", type=float, default=7)
+    parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--project")
+    parser.add_argument("--include-latest", action="store_true")
+    parser.add_argument("--all", action="store_true")
+    parser.add_argument("--reset", action="store_true")
+
+
+def leaf(subparsers, name, dispatch_command, help):
+    parser = subparsers.add_parser(name, help=help)
+    parser.set_defaults(dispatch_command=dispatch_command)
+    return parser
+
+
 def build_parser():
     parser = argparse.ArgumentParser(description="GitLab migration launcher")
     add_runtime_options(parser)
@@ -71,62 +146,124 @@ def build_parser():
         dest="command", metavar="COMMAND", title="commands"
     )
 
-    migrate = commands.add_parser("migrate", help="Migrate repositories and recent merge requests.")
-    migrate.add_argument("--days", type=float, default=30)
-    migrate.add_argument("--reset-merge-requests", action="store_true")
-    migrate.add_argument(
-        "--reset",
-        action="store_true",
-        help="Clear repository checkpoints and migrate every repository again.",
+    migrate = commands.add_parser("migrate", help="Run migration operations.")
+    migrate.set_defaults(dispatch_command="migrate")
+    add_migrate_all_options(migrate)
+    migrate_commands = migrate.add_subparsers(dest="migrate_command", metavar="TARGET")
+    add_migrate_all_options(leaf(
+        migrate_commands, "all", "migrate",
+        "Migrate repositories and recent merge requests.",
+    ))
+    add_migrate_mr_options(leaf(
+        migrate_commands, "mr", "migrate-merge-requests",
+        "Migrate only recent merge requests.",
+    ))
+    variables = leaf(
+        migrate_commands, "vars", "migrate-variables",
+        "Migrate project or group CI/CD variables.",
     )
-    migrate.add_argument(
-        "--yes",
-        action="store_true",
-        help="Skip the source and destination confirmation prompt.",
+    variable_scopes = variables.add_subparsers(dest="variable_scope", metavar="SCOPE")
+    leaf(
+        variable_scopes, "group", "migrate-group-variables",
+        "Migrate group CI/CD variables.",
     )
-    merge_requests = commands.add_parser("migrate-merge-requests", help="Migrate only recent merge requests.")
-    merge_requests.add_argument("--days", type=float, default=30)
-    merge_requests.add_argument("--reset", action="store_true")
-    commands.add_parser("migrate-variables", help="Migrate project CI/CD variables.")
-    commands.add_parser("migrate-group-variables", help="Migrate group CI/CD variables.")
-    commands.add_parser("migrate-hooks", help="Migrate project webhooks.")
-    commands.add_parser("migrate-protection", help="Migrate branch protection rules.")
-    commands.add_parser("export-runners", help="Export source runner details.")
+    leaf(migrate_commands, "hooks", "migrate-hooks", "Migrate project webhooks.")
+    branch = migrate_commands.add_parser(
+        "branch", help="Migrate branch-related settings."
+    )
+    branch_commands = branch.add_subparsers(dest="branch_command", metavar="SETTING")
+    leaf(
+        branch_commands, "protection", "migrate-protection",
+        "Migrate branch protection rules.",
+    )
 
-    deploy = commands.add_parser("deploy-runners", help="Deploy paused runners on their existing hosts.")
-    deploy.add_argument("--plan")
-    deploy.add_argument("--keys-dir")
-    deploy.add_argument("--port", type=int, default=22)
-    commands.add_parser("resume-runners", help="Enable successfully deployed runners.")
+    runners = commands.add_parser("runners", help="Manage runner migration.")
+    runner_commands = runners.add_subparsers(dest="runner_command", metavar="ACTION")
+    leaf(runner_commands, "export", "export-runners", "Export source runner details.")
+    add_runner_deploy_options(leaf(
+        runner_commands, "deploy", "deploy-runners",
+        "Deploy paused runners on their existing hosts.",
+    ))
+    leaf(
+        runner_commands, "resume", "resume-runners",
+        "Enable successfully deployed runners.",
+    )
 
-    export = commands.add_parser("export-pipelines", help="Export recent pipeline audit history.")
-    export.add_argument("--days", type=float, default=30)
-    export.add_argument("--reset", action="store_true")
-    replay = commands.add_parser("replay-pipelines", help="Replay archived pipelines as new runs.")
-    replay.add_argument("--file")
-    replay.add_argument("--all-records", action="store_true")
+    pipelines = commands.add_parser("pipelines", help="Manage pipeline operations.")
+    pipeline_commands = pipelines.add_subparsers(
+        dest="pipeline_command", metavar="ACTION"
+    )
+    add_pipeline_export_options(leaf(
+        pipeline_commands, "export", "export-pipelines",
+        "Export recent pipeline audit history.",
+    ))
+    add_pipeline_replay_options(leaf(
+        pipeline_commands, "replay", "replay-pipelines",
+        "Replay archived pipelines as new runs.",
+    ))
+    add_pipeline_cancel_options(leaf(
+        pipeline_commands, "cancel", "cancel-pipelines",
+        "Preview or cancel active pipelines and jobs.",
+    ))
 
-    registry = commands.add_parser("migrate-registry", help="Copy recent container-registry images.")
-    registry.add_argument("--days", type=float, default=30)
-    registry.add_argument("--reset", action="store_true")
-    retention = commands.add_parser("set-registry-retention", help="Configure registry cleanup policies.")
-    retention.add_argument("--day", "--days", dest="days", type=int, default=7)
-    retention.add_argument("--execute", action="store_true")
-    retention.add_argument("--project")
-    retention.add_argument("--reset", action="store_true")
-    purge = commands.add_parser("purge-registry-images", help="Preview or delete registry image tags.")
-    purge.add_argument("--days", type=float, default=7)
-    purge.add_argument("--execute", action="store_true")
-    purge.add_argument("--project")
-    purge.add_argument("--include-latest", action="store_true")
-    purge.add_argument("--all", action="store_true")
-    purge.add_argument("--reset", action="store_true")
+    registry = commands.add_parser("registry", help="Manage container registry operations.")
+    registry_commands = registry.add_subparsers(dest="registry_command", metavar="ACTION")
+    add_registry_migrate_options(leaf(
+        registry_commands, "migrate", "migrate-registry",
+        "Copy recent container-registry images.",
+    ))
+    add_registry_retention_options(leaf(
+        registry_commands, "retention", "set-registry-retention",
+        "Configure registry cleanup policies.",
+    ))
+    add_registry_purge_options(leaf(
+        registry_commands, "purge", "purge-registry-images",
+        "Preview or delete registry image tags.",
+    ))
 
-    cancel = commands.add_parser("cancel-pipelines", help="Preview or cancel active pipelines and jobs.")
-    cancel.add_argument("--execute", action="store_true")
-    cancel.add_argument("--project")
-    cancel.add_argument("--hours", type=float, default=24)
-    cancel.add_argument("--include-manual", action="store_true")
+    # Pre-0.5 command names remain available for scripts and automation.
+    legacy = commands.add_parser("migrate-merge-requests", help=argparse.SUPPRESS)
+    legacy.set_defaults(dispatch_command="migrate-merge-requests")
+    add_migrate_mr_options(legacy)
+    for name, target in (
+        ("migrate-variables", "migrate-variables"),
+        ("migrate-group-variables", "migrate-group-variables"),
+        ("migrate-hooks", "migrate-hooks"),
+        ("migrate-protection", "migrate-protection"),
+        ("export-runners", "export-runners"),
+        ("resume-runners", "resume-runners"),
+    ):
+        commands.add_parser(name, help=argparse.SUPPRESS).set_defaults(
+            dispatch_command=target
+        )
+    legacy = commands.add_parser("deploy-runners", help=argparse.SUPPRESS)
+    legacy.set_defaults(dispatch_command="deploy-runners")
+    add_runner_deploy_options(legacy)
+    legacy = commands.add_parser("export-pipelines", help=argparse.SUPPRESS)
+    legacy.set_defaults(dispatch_command="export-pipelines")
+    add_pipeline_export_options(legacy)
+    legacy = commands.add_parser("replay-pipelines", help=argparse.SUPPRESS)
+    legacy.set_defaults(dispatch_command="replay-pipelines")
+    add_pipeline_replay_options(legacy)
+    legacy = commands.add_parser("cancel-pipelines", help=argparse.SUPPRESS)
+    legacy.set_defaults(dispatch_command="cancel-pipelines")
+    add_pipeline_cancel_options(legacy)
+    legacy = commands.add_parser("migrate-registry", help=argparse.SUPPRESS)
+    legacy.set_defaults(dispatch_command="migrate-registry")
+    add_registry_migrate_options(legacy)
+    legacy = commands.add_parser("set-registry-retention", help=argparse.SUPPRESS)
+    legacy.set_defaults(dispatch_command="set-registry-retention")
+    add_registry_retention_options(legacy)
+    legacy = commands.add_parser("purge-registry-images", help=argparse.SUPPRESS)
+    legacy.set_defaults(dispatch_command="purge-registry-images")
+    add_registry_purge_options(legacy)
+    # argparse does not honor SUPPRESS for subparser help entries. Keep legacy
+    # parsers callable without advertising them in the primary command list.
+    visible_commands = {"migrate", "runners", "pipelines", "registry"}
+    commands._choices_actions = [
+        action for action in commands._choices_actions
+        if action.dest in visible_commands
+    ]
     return parser
 
 
@@ -146,7 +283,8 @@ def optional_flags(args, pairs):
 
 
 def dispatch(args):
-    if args.command == "migrate":
+    command = getattr(args, "dispatch_command", None)
+    if command == "migrate":
         repository_arguments = []
         if args.yes:
             repository_arguments.append("--yes")
@@ -161,30 +299,30 @@ def dispatch(args):
         if args.reset_merge_requests:
             arguments.append("--reset")
         return run_command("migrate-merge-requests", arguments)
-    if args.command == "migrate-merge-requests":
+    if command == "migrate-merge-requests":
         arguments = ["--execute", "--days", str(args.days)]
         if args.reset:
             arguments.append("--reset")
-        return run_command(args.command, arguments)
-    if args.command in {
+        return run_command(command, arguments)
+    if command in {
         "export-runners", "migrate-variables", "migrate-group-variables",
         "migrate-hooks", "migrate-protection",
     }:
-        return run_command(args.command)
-    if args.command == "deploy-runners":
-        return run_command(args.command, [
+        return run_command(command)
+    if command == "deploy-runners":
+        return run_command(command, [
             "--plan", args.plan or str(output_dir() / "runners.json"),
             "--keys-dir", args.keys_dir or "data/keys",
             "--port", str(args.port),
         ])
-    if args.command == "resume-runners":
+    if command == "resume-runners":
         return run_command("deploy-runners", ["--resume"])
-    if args.command == "export-pipelines":
+    if command == "export-pipelines":
         arguments = ["--days", str(args.days)]
         if args.reset:
             arguments.append("--reset")
-        return run_command(args.command, arguments)
-    if args.command == "replay-pipelines":
+        return run_command(command, arguments)
+    if command == "replay-pipelines":
         arguments = [
             "--replay", "--execute", "--file",
             args.file or str(output_dir() / "pipeline_history.json"),
@@ -192,23 +330,23 @@ def dispatch(args):
         if args.all_records:
             arguments.append("--all-records")
         return run_command("export-pipelines", arguments)
-    if args.command == "migrate-registry":
+    if command == "migrate-registry":
         arguments = ["--execute", "--days", str(args.days)]
         if args.reset:
             arguments.append("--reset")
-        return run_command(args.command, arguments)
-    if args.command == "set-registry-retention":
+        return run_command(command, arguments)
+    if command == "set-registry-retention":
         arguments = ["--day", str(args.days)]
         arguments += optional_flags(args, [
             ("execute", "--execute"), ("reset", "--reset")
         ])
-    elif args.command == "purge-registry-images":
+    elif command == "purge-registry-images":
         arguments = ["--days", str(args.days)]
         arguments += optional_flags(args, [
             ("execute", "--execute"), ("include_latest", "--include-latest"),
             ("all", "--all"), ("reset", "--reset"),
         ])
-    elif args.command == "cancel-pipelines":
+    elif command == "cancel-pipelines":
         arguments = ["--hours", str(args.hours)]
         arguments += optional_flags(args, [
             ("execute", "--execute"), ("include_manual", "--include-manual")
@@ -217,7 +355,7 @@ def dispatch(args):
         return 2
     if getattr(args, "project", None):
         arguments.extend(["--project", args.project])
-    return run_command(args.command, arguments)
+    return run_command(command, arguments)
 
 
 def main():
@@ -226,4 +364,6 @@ def main():
     if args.command is None:
         build_parser().print_help()
         return 0
+    if not getattr(args, "dispatch_command", None):
+        build_parser().parse_args([args.command, "--help"])
     return dispatch(args)

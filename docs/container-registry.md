@@ -5,13 +5,13 @@ Registry migration uses Skopeo to copy images without a local Docker daemon. Con
 ## Copy recent images
 
 ```bash
-gitlab-migrator migrate-registry --days 30
+gitlab-migrator registry migrate --days 30
 ```
 
 Reset its progress only when you intentionally want to reconsider completed records:
 
 ```bash
-gitlab-migrator migrate-registry --days 30 --reset
+gitlab-migrator registry migrate --days 30 --reset
 ```
 
 Verify authentication and available destination storage before a large run. Registry manifests may reference substantial shared blob data.
@@ -21,13 +21,13 @@ Verify authentication and available destination storage before a large run. Regi
 Preview the policy changes:
 
 ```bash
-gitlab-migrator set-registry-retention --days 7
+gitlab-migrator registry retention --days 7
 ```
 
 Apply them after review:
 
 ```bash
-gitlab-migrator set-registry-retention --days 7 --execute
+gitlab-migrator registry retention --days 7 --execute
 ```
 
 Use `--project` to constrain the operation and `--reset` to rebuild its progress state.
@@ -37,13 +37,13 @@ Use `--project` to constrain the operation and `--reset` to rebuild its progress
 Preview is the default:
 
 ```bash
-gitlab-migrator purge-registry-images --days 30
+gitlab-migrator registry purge --days 30
 ```
 
 Delete after validating the candidate list:
 
 ```bash
-gitlab-migrator purge-registry-images --days 30 --execute
+gitlab-migrator registry purge --days 30 --execute
 ```
 
 Additional options include `--project`, `--include-latest`, `--all`, and `--reset`. Purging is destructive; preserve the preview, confirm retention/legal requirements, and ensure required images exist elsewhere before execution.

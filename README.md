@@ -45,13 +45,13 @@ DEST_ROOT_GROUP=destination-group
 Review the detected endpoints and start:
 
 ```bash
-gitlab-migrator migrate
+gitlab-migrator migrate all
 ```
 
 For reviewed automation, bypass only the initial source/destination confirmation:
 
 ```bash
-gitlab-migrator migrate --yes
+gitlab-migrator migrate all --yes
 ```
 
 The default `.env` file and `data/` directory are relative to the directory
@@ -65,7 +65,7 @@ gitlab-migrator \
   --env-file /srv/gitlab-migrator/config/.env \
   --output-dir /srv/gitlab-migrator/data/reports \
   --workspace-dir /srv/gitlab-migrator/data/repositories \
-  migrate
+  migrate all
 ```
 
 See [Configuration](docs/configuration.md) for variables, exported locations, filters, and secret handling.
@@ -76,11 +76,10 @@ Run `gitlab-migrator COMMAND --help` for command-specific options.
 
 | Area | Commands |
 | --- | --- |
-| Repositories | `migrate`<br>`migrate-merge-requests` |
-| GitLab metadata | `migrate-variables`<br>`migrate-group-variables`<br>`migrate-hooks`<br>`migrate-protection` |
-| Runners | `export-runners`<br>`deploy-runners`<br>`resume-runners` |
-| Pipelines | `export-pipelines`<br>`replay-pipelines`<br>`cancel-pipelines` |
-| Registry | `migrate-registry`<br>`set-registry-retention`<br>`purge-registry-images` |
+| Migration | `migrate all`<br>`migrate mr`<br>`migrate vars [group]`<br>`migrate hooks`<br>`migrate branch protection` |
+| Runners | `runners export`<br>`runners deploy`<br>`runners resume` |
+| Pipelines | `pipelines export`<br>`pipelines replay`<br>`pipelines cancel` |
+| Registry | `registry migrate`<br>`registry retention`<br>`registry purge` |
 
 Commands that can remove or cancel data use preview/dry-run behavior unless their help explicitly requires `--execute`. Always review the preview.
 
@@ -92,12 +91,12 @@ A ready-to-use image contains Git, Git LFS, OpenSSH, and Skopeo:
 cp .env.example .env
 docker compose --env-file .env -f docker/docker-compose.yml pull
 docker compose --env-file .env -f docker/docker-compose.yml up -d
-docker exec -it gitlab-migrator gitlab-migrator migrate
+docker exec -it gitlab-migrator gitlab-migrator migrate all
 ```
 
 Native and Docker commands share the root-level `.env` and `data/` directory.
 The Compose container is a persistent toolbox and stays running after commands
-finish. Migrations can instead run as detached jobs with `migrate --yes`, then
+finish. Migrations can instead run as detached jobs with `migrate all --yes`, then
 be monitored through `docker logs -f`. Runner deployment should remain
 attached because it can require manual SSH choices.
 

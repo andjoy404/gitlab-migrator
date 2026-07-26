@@ -7,7 +7,12 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [0.4.1] - 2026-07-27
+## [0.5.0] - 2026-07-27
+
+### Added
+
+- Add grouped CLI commands for migrations, runners, pipelines, and container
+  registry operations while retaining the pre-0.5 command names as aliases.
 
 ### Fixed
 

@@ -34,7 +34,7 @@ docker compose --env-file .env -f docker/docker-compose.yml up -d
 The Compose service is a persistent toolbox. It stays running after a migration finishes:
 
 ```bash
-docker exec -it gitlab-migrator gitlab-migrator migrate
+docker exec -it gitlab-migrator gitlab-migrator migrate all
 ```
 
 ## Build locally
@@ -63,7 +63,7 @@ GITLAB_MIGRATOR_IMAGE=gitlab-migrator:local
 Interactive repository migration:
 
 ```bash
-docker exec -it gitlab-migrator gitlab-migrator migrate
+docker exec -it gitlab-migrator gitlab-migrator migrate all
 ```
 
 Detached migration without the initial confirmation (recommended for long runs):
@@ -71,7 +71,7 @@ Detached migration without the initial confirmation (recommended for long runs):
 ```bash
 docker compose --env-file .env -f docker/docker-compose.yml run -d \
   --name gitlab-migrator-job \
-  gitlab-migrator migrate --yes
+  gitlab-migrator migrate all --yes
 
 docker logs -f gitlab-migrator-job
 ```
@@ -92,7 +92,7 @@ Runner deployment can ask per-host SSH questions, so keep it attached:
 
 ```bash
 docker exec -it gitlab-migrator \
-  gitlab-migrator deploy-runners --keys-dir /data/keys
+  gitlab-migrator runners deploy --keys-dir /data/keys
 ```
 
 ## Persistent data

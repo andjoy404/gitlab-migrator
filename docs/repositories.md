@@ -3,7 +3,7 @@
 ## Migrate
 
 ```bash
-gitlab-migrator migrate
+gitlab-migrator migrate all
 ```
 
 The command prints the source and destination and waits for `yes`. Any other answer cancels both repository and merge-request phases.
@@ -11,7 +11,7 @@ The command prints the source and destination and waits for `yes`. Any other ans
 For reviewed automation, skip only that confirmation:
 
 ```bash
-gitlab-migrator migrate --yes
+gitlab-migrator migrate all --yes
 ```
 
 Repository mirrors run first. Every successful repository is immediately saved to
@@ -20,7 +20,7 @@ same command again; completed repositories are skipped and unfinished ones retry
 Recent merge requests are then recreated for the configured time window:
 
 ```bash
-gitlab-migrator migrate --days 90
+gitlab-migrator migrate all --days 90
 ```
 
 ## Limit the scope
@@ -44,25 +44,25 @@ Increase `MIGRATE_WORKERS` cautiously; Git operations, GitLab rate limits, and d
 ## Merge requests only
 
 ```bash
-gitlab-migrator migrate-merge-requests --days 30
+gitlab-migrator migrate mr --days 30
 ```
 
 Restart all repository mirrors intentionally:
 
 ```bash
-gitlab-migrator migrate --reset
+gitlab-migrator migrate all --reset
 ```
 
 This resets repository checkpoints only. To reset recent merge requests too:
 
 ```bash
-gitlab-migrator migrate --reset --reset-merge-requests
+gitlab-migrator migrate all --reset --reset-mr
 ```
 
 Reset the merge-request-only checkpoint when intentionally rebuilding its result:
 
 ```bash
-gitlab-migrator migrate-merge-requests --days 30 --reset
+gitlab-migrator migrate mr --days 30 --reset
 ```
 
 Merge requests are recreated as historical migration records/new destination objects; GitLab does not provide a perfect cross-instance transfer of every internal event and identifier. Review results before relying on them as an audit archive.
@@ -70,10 +70,10 @@ Merge requests are recreated as historical migration records/new destination obj
 ## Supporting metadata
 
 ```bash
-gitlab-migrator migrate-group-variables
-gitlab-migrator migrate-variables
-gitlab-migrator migrate-hooks
-gitlab-migrator migrate-protection
+gitlab-migrator migrate vars group
+gitlab-migrator migrate vars
+gitlab-migrator migrate hooks
+gitlab-migrator migrate branch protection
 ```
 
 Treat report checkpoints as operational state. Back them up before using reset

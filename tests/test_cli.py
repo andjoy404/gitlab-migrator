@@ -9,6 +9,30 @@ from gitlab_migrator.constants import USER_CANCELLED
 
 
 class CliTests(unittest.TestCase):
+    def test_grouped_commands_map_to_existing_operations(self):
+        parser = cli.build_parser()
+        commands = {
+            ("migrate", "all"): "migrate",
+            ("migrate", "mr"): "migrate-merge-requests",
+            ("migrate", "vars"): "migrate-variables",
+            ("migrate", "vars", "group"): "migrate-group-variables",
+            ("migrate", "hooks"): "migrate-hooks",
+            ("migrate", "branch", "protection"): "migrate-protection",
+            ("runners", "export"): "export-runners",
+            ("runners", "deploy"): "deploy-runners",
+            ("runners", "resume"): "resume-runners",
+            ("pipelines", "export"): "export-pipelines",
+            ("pipelines", "replay"): "replay-pipelines",
+            ("pipelines", "cancel"): "cancel-pipelines",
+            ("registry", "migrate"): "migrate-registry",
+            ("registry", "retention"): "set-registry-retention",
+            ("registry", "purge"): "purge-registry-images",
+        }
+        for arguments, operation in commands.items():
+            with self.subTest(arguments=arguments):
+                parsed = parser.parse_args(arguments)
+                self.assertEqual(parsed.dispatch_command, operation)
+
     def test_all_documented_commands_parse(self):
         parser = cli.build_parser()
         commands = [
@@ -30,13 +54,14 @@ class CliTests(unittest.TestCase):
         self.assertIn("COMMAND ...", help_text)
         self.assertNotIn("{migrate,migrate-merge-requests", help_text)
         self.assertIn(
-            "migrate             Migrate repositories and recent merge requests.",
+            "migrate             Run migration operations.",
             help_text,
         )
         self.assertIn(
-            "export-runners      Export source runner details.",
+            "runners             Manage runner migration.",
             help_text,
         )
+        self.assertNotIn("migrate-merge-requests", help_text)
 
     def test_runtime_directories_are_exported_to_children(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -62,7 +87,7 @@ class CliTests(unittest.TestCase):
     @patch("gitlab_migrator.cli.run_command")
     def test_runner_defaults_use_shared_data_layout(self, run):
         run.return_value = 0
-        args = cli.build_parser().parse_args(["deploy-runners"])
+        args = cli.build_parser().parse_args(["runners", "deploy"])
 
         self.assertEqual(cli.dispatch(args), 0)
         run.assert_called_once_with("deploy-runners", [

@@ -43,7 +43,7 @@ gitlab-migrator \
   --env-file /srv/gitlab-migrator/config/.env \
   --workspace-dir /srv/gitlab-migrator/data/repositories \
   --output-dir /srv/gitlab-migrator/data/reports \
-  migrate
+  migrate all
 ```
 
 You can export the same locations for repeated use:
@@ -52,7 +52,7 @@ You can export the same locations for repeated use:
 export GITLAB_MIGRATOR_ENV_FILE=/srv/gitlab-migrator/config/.env
 export GITLAB_MIGRATOR_WORKSPACE_DIR=/srv/gitlab-migrator/data/repositories
 export GITLAB_MIGRATOR_OUTPUT_DIR=/srv/gitlab-migrator/data/reports
-gitlab-migrator migrate
+gitlab-migrator migrate all
 ```
 
 CLI location options override the corresponding environment variables. The
