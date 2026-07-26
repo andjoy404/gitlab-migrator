@@ -7,6 +7,13 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-07-27
+
+### Fixed
+
+- Keep migration data created with the pre-0.4 `output`, `workspace`, and
+  `keys` paths ignored during upgrades.
+
 ## [0.4.0] - 2026-07-27
 
 ### Added

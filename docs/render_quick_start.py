@@ -59,7 +59,7 @@ def main():
         ),
         ("$ cp .env.example .env", None),
         ("$ $EDITOR .env", "# Add source and destination settings"),
-        ("$ gitlab-migrator --version", "gitlab-migrator 0.4.0"),
+        ("$ gitlab-migrator --version", "gitlab-migrator 0.4.1"),
         ("$ gitlab-migrator migrate", "Continue migration? (yes/no):"),
     ]
     frames, durations, lines = [], [], []
