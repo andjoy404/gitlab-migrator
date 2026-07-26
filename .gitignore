@@ -1,10 +1,12 @@
 /.env
 /.venv/
-/keys/
-/output/**
-/workspace/**
+/data/repositories/**
+/data/reports/**
+/data/keys/**
+!/data/repositories/.gitkeep
+!/data/reports/.gitkeep
+!/data/keys/.gitkeep
 /docker/.env
-/docker/data/**
 __pycache__/
 *.py[cod]
 *.egg-info/

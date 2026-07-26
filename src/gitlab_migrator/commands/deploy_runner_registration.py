@@ -747,7 +747,7 @@ def resume_results(api, results_file):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--plan", default=str(output_path("runners.json")))
-    parser.add_argument("--keys-dir", default="keys")
+    parser.add_argument("--keys-dir", default="data/keys")
     parser.add_argument("--port", type=int, default=22)
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()

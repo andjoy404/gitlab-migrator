@@ -41,8 +41,8 @@ Global location options must come before the subcommand:
 ```bash
 gitlab-migrator \
   --env-file /srv/gitlab-migrator/config/.env \
-  --workspace-dir /srv/gitlab-migrator/workspace \
-  --output-dir /srv/gitlab-migrator/output \
+  --workspace-dir /srv/gitlab-migrator/data/repositories \
+  --output-dir /srv/gitlab-migrator/data/reports \
   migrate
 ```
 
@@ -50,13 +50,17 @@ You can export the same locations for repeated use:
 
 ```bash
 export GITLAB_MIGRATOR_ENV_FILE=/srv/gitlab-migrator/config/.env
-export GITLAB_MIGRATOR_WORKSPACE_DIR=/srv/gitlab-migrator/workspace
-export GITLAB_MIGRATOR_OUTPUT_DIR=/srv/gitlab-migrator/output
+export GITLAB_MIGRATOR_WORKSPACE_DIR=/srv/gitlab-migrator/data/repositories
+export GITLAB_MIGRATOR_OUTPUT_DIR=/srv/gitlab-migrator/data/reports
 gitlab-migrator migrate
 ```
 
-CLI location options override the corresponding environment variables. Relative output and workspace paths resolve from the current directory.
+CLI location options override the corresponding environment variables. The
+defaults are `data/reports` and `data/repositories`. Relative paths resolve
+from the current directory.
 
 ## Protect secrets
 
-Never commit `.env`, tokens, runner SSH keys, output, or workspace data. Revoke a token immediately if it is exposed in a terminal recording, issue, chat, or commit.
+Never commit `.env`, tokens, runner SSH keys, reports, or repository data.
+Revoke a token immediately if it is exposed in a terminal recording, issue,
+chat, or commit.

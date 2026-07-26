@@ -12,8 +12,10 @@ from .config import (
     DEST_TOKEN,
 )
 
-WORKSPACE = Path(os.getenv("GITLAB_MIGRATOR_WORKSPACE_DIR", "workspace"))
-WORKSPACE.mkdir(exist_ok=True)
+WORKSPACE = Path(
+    os.getenv("GITLAB_MIGRATOR_WORKSPACE_DIR", "data/repositories")
+)
+WORKSPACE.mkdir(parents=True, exist_ok=True)
 
 
 # ==========================================================

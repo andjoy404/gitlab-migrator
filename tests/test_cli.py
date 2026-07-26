@@ -55,6 +55,22 @@ class CliTests(unittest.TestCase):
                     os.environ["GITLAB_MIGRATOR_WORKSPACE_DIR"], expected
                 )
 
+    def test_default_report_directory_uses_shared_data_layout(self):
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(cli.output_dir(), Path("data/reports"))
+
+    @patch("gitlab_migrator.cli.run_command")
+    def test_runner_defaults_use_shared_data_layout(self, run):
+        run.return_value = 0
+        args = cli.build_parser().parse_args(["deploy-runners"])
+
+        self.assertEqual(cli.dispatch(args), 0)
+        run.assert_called_once_with("deploy-runners", [
+            "--plan", "data/reports/runners.json",
+            "--keys-dir", "data/keys",
+            "--port", "22",
+        ])
+
     @patch("gitlab_migrator.cli.run_command")
     def test_cancelled_repository_migration_stops_second_phase(self, run):
         run.return_value = USER_CANCELLED

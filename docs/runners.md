@@ -8,24 +8,27 @@ Runner migration is deliberately staged: export, deploy while paused, verify, th
 gitlab-migrator export-runners
 ```
 
-The default plan is `output/runners.json`. Use `RUNNER_GROUP` to limit its scope when necessary.
+The default plan is `data/reports/runners.json`. Use `RUNNER_GROUP` to limit
+its scope when necessary.
 
 ## Prepare SSH access
 
-Put private keys in `keys/` for a native installation or `docker/data/keys/` for Docker. Restrict permissions:
+Put private keys in `data/keys/`. Native and Docker commands use the same
+root-level directory. Restrict permissions:
 
 ```bash
-chmod 600 keys/*
+chmod 600 data/keys/*
 ```
 
-Do not commit keys. The Docker deployment mounts them read-only.
+Do not commit keys. The shared `data` directory is writable by the container,
+so keep the private-key files read-only for the configured host user.
 
 ## Deploy
 
 ```bash
 gitlab-migrator deploy-runners \
-  --plan output/runners.json \
-  --keys-dir keys \
+  --plan data/reports/runners.json \
+  --keys-dir data/keys \
   --port 22
 ```
 

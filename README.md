@@ -15,8 +15,14 @@ A command-line toolkit for moving repositories and selected operational data bet
 Install from GitHub:
 
 ```bash
+pipx ensurepath
 pipx install git+https://github.com/andjoy404/gitlab-migrator.git
 ```
+
+Open a new terminal after `pipx ensurepath`, then confirm the command is
+available with `gitlab-migrator --version`. See
+[Installation and upgrades](docs/installation.md) for macOS, Linux/WSL2,
+native Windows, and `PATH` troubleshooting.
 
 Create local configuration:
 
@@ -48,13 +54,17 @@ For reviewed automation, bypass only the initial source/destination confirmation
 gitlab-migrator migrate --yes
 ```
 
-The default `.env`, `output`, and `workspace` locations are relative to the directory where the command runs. Custom global options must appear before the subcommand:
+The default `.env` file and `data/` directory are relative to the directory
+where the command runs. Reports are stored in `data/reports`, temporary Git
+mirrors in `data/repositories`, and runner SSH keys in `data/keys`. Native and
+Docker commands use this same layout. Custom global options must appear before
+the subcommand:
 
 ```bash
 gitlab-migrator \
   --env-file /srv/gitlab-migrator/config/.env \
-  --output-dir /srv/gitlab-migrator/output \
-  --workspace-dir /srv/gitlab-migrator/workspace \
+  --output-dir /srv/gitlab-migrator/data/reports \
+  --workspace-dir /srv/gitlab-migrator/data/repositories \
   migrate
 ```
 
@@ -79,13 +89,17 @@ Commands that can remove or cancel data use preview/dry-run behavior unless thei
 A ready-to-use image contains Git, Git LFS, OpenSSH, and Skopeo:
 
 ```bash
-cp docker/.env.example docker/.env
-docker compose -f docker/docker-compose.yml pull
-docker compose -f docker/docker-compose.yml up -d
+cp .env.example .env
+docker compose --env-file .env -f docker/docker-compose.yml pull
+docker compose --env-file .env -f docker/docker-compose.yml up -d
 docker exec -it gitlab-migrator gitlab-migrator migrate
 ```
 
-The Compose container is a persistent toolbox and stays running after commands finish. Migrations can instead run as detached jobs with `migrate --yes`, then be monitored through `docker logs -f`. Runner deployment should remain attached because it can require manual SSH choices.
+Native and Docker commands share the root-level `.env` and `data/` directory.
+The Compose container is a persistent toolbox and stays running after commands
+finish. Migrations can instead run as detached jobs with `migrate --yes`, then
+be monitored through `docker logs -f`. Runner deployment should remain
+attached because it can require manual SSH choices.
 
 Read [Docker deployment](docs/docker.md) for local builds, GHCR, volumes, detached jobs, logs, and runner keys.
 
@@ -116,7 +130,10 @@ pipx install --force git+https://github.com/andjoy404/gitlab-migrator.git
 
 ## Security
 
-Never commit `.env`, access tokens, SSH keys, generated output, or workspace mirrors. Use minimally scoped tokens, protect configuration permissions, rotate exposed credentials immediately, and verify destination backups before destructive registry or pipeline operations.
+Never commit `.env`, access tokens, SSH keys, generated reports, or repository
+mirrors. Use minimally scoped tokens, protect configuration permissions, rotate
+exposed credentials immediately, and verify destination backups before
+destructive registry or pipeline operations.
 
 ## Development
 

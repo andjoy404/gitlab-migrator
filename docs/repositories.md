@@ -15,7 +15,7 @@ gitlab-migrator migrate --yes
 ```
 
 Repository mirrors run first. Every successful repository is immediately saved to
-`output/repository_migration_results.json`. If the command is stopped, run the
+`data/reports/repository_migration_results.json`. If the command is stopped, run the
 same command again; completed repositories are skipped and unfinished ones retry.
 Recent merge requests are then recreated for the configured time window:
 
@@ -76,4 +76,5 @@ gitlab-migrator migrate-hooks
 gitlab-migrator migrate-protection
 ```
 
-Treat output checkpoints as operational state. Back them up before using reset options.
+Treat report checkpoints as operational state. Back them up before using reset
+options.

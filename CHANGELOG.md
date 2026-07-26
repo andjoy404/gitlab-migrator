@@ -7,10 +7,18 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-07-27
+
 ### Added
 
 - Add resumable repository migration checkpoints and `migrate --reset` for an
   intentional full repository replay.
+
+### Changed
+
+- Store native and Docker runtime data in the shared root-level
+  `data/repositories`, `data/reports`, and `data/keys` directories.
+- Use the same root-level `.env` file for native and Docker execution.
 
 ### Fixed
 

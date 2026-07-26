@@ -29,7 +29,7 @@ MODULES = {
 
 
 def output_dir():
-    return Path(os.getenv("GITLAB_MIGRATOR_OUTPUT_DIR", "output"))
+    return Path(os.getenv("GITLAB_MIGRATOR_OUTPUT_DIR", "data/reports"))
 
 
 def run_command(name, arguments=None):
@@ -174,7 +174,7 @@ def dispatch(args):
     if args.command == "deploy-runners":
         return run_command(args.command, [
             "--plan", args.plan or str(output_dir() / "runners.json"),
-            "--keys-dir", args.keys_dir or "keys",
+            "--keys-dir", args.keys_dir or "data/keys",
             "--port", str(args.port),
         ])
     if args.command == "resume-runners":

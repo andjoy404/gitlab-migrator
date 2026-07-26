@@ -11,12 +11,11 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - >-
+        mkdir -p /data/reports /data/repositories /data/keys &&
         chown -R ${USER_ID:-1000}:${GROUP_ID:-1000}
-        /data/output /data/workspace /data/keys
+        /data/reports /data/repositories /data/keys
     volumes:
-      - ./data/output:/data/output
-      - ./data/workspace:/data/workspace
-      - ./data/keys:/data/keys
+      - ../data:/data
     restart: "no"
 
   gitlab-migrator:
@@ -34,14 +33,12 @@ services:
         condition: service_completed_successfully
     command: ["sleep", "infinity"]
     env_file:
-      - .env
+      - ../.env
     environment:
-      GITLAB_MIGRATOR_OUTPUT_DIR: /data/output
-      GITLAB_MIGRATOR_WORKSPACE_DIR: /data/workspace
+      GITLAB_MIGRATOR_OUTPUT_DIR: /data/reports
+      GITLAB_MIGRATOR_WORKSPACE_DIR: /data/repositories
     volumes:
-      - ./data/output:/data/output
-      - ./data/workspace:/data/workspace
-      - ./data/keys:/data/keys:ro
+      - ../data:/data
     stdin_open: true
     tty: true
     restart: unless-stopped

@@ -24,7 +24,7 @@ python -m unittest discover -s tests -v
 - Keep changes focused and explain the migration scenario they address.
 - Add or update tests for behavior changes.
 - Preserve dry-run defaults for destructive administration commands.
-- Never commit tokens, `.env` files, SSH keys, migration workspaces, or output.
+- Never commit tokens, `.env` files, SSH keys, repository mirrors, or reports.
 - Document new commands and configuration in `README.md`.
 
 By submitting a contribution, you agree that it is licensed under the MIT

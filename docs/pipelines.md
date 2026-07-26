@@ -8,7 +8,8 @@ Pipeline history migration is an audit/replay workflow, not a byte-for-byte tran
 gitlab-migrator export-pipelines --days 30
 ```
 
-The default archive is written under `output/`. To intentionally start the export again:
+The default archive is written under `data/reports/`. To intentionally start
+the export again:
 
 ```bash
 gitlab-migrator export-pipelines --days 30 --reset
@@ -24,7 +25,7 @@ Choose another archive or include all records:
 
 ```bash
 gitlab-migrator replay-pipelines \
-  --file /srv/gitlab-migrator/output/pipeline_history.json \
+  --file /srv/gitlab-migrator/data/reports/pipeline_history.json \
   --all-records
 ```
 
