@@ -22,6 +22,7 @@ from gitlab_migrator.gitlab_api import GitLabAPI
 from gitlab_migrator.namespace import NamespaceManager
 from gitlab_migrator.mirror import mirror
 from gitlab_migrator.paths import output_path
+from gitlab_migrator.project_filters import apply_project_exclusions
 from gitlab_migrator.repository_progress import (
     load_repository_progress,
     save_repository_progress,
@@ -168,6 +169,12 @@ elif group_filter:
         )
 
     print(f"Syncing only group: {group_filter}")
+
+projects, excluded_projects = apply_project_exclusions(projects, SOURCE_GROUP)
+for project in excluded_projects:
+    print(f"{project['path_with_namespace']} - skipped (excluded)")
+if excluded_projects:
+    print(f"Excluded {len(excluded_projects)} projects.")
 
 discovered_total = len(projects)
 projects = [

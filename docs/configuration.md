@@ -26,11 +26,15 @@ The default configuration file is `./.env` in the current working directory.
 | --- | --- | --- |
 | `MIGRATE_PROJECT` | Process one full source project path | empty |
 | `MIGRATE_GROUP` | Process one source group subtree | empty |
+| `EXCLUDE_PROJECTS` | Skip comma-separated full source project paths | empty |
+| `EXCLUDE_GROUPS` | Skip comma-separated source group subtrees | empty |
 | `MIGRATE_WORKERS` | Concurrent repository workers | `1` |
 | `RUNNER_GROUP` | Limit runner export to a group | empty |
 | `RUNNER_SSH_CONNECT_TIMEOUT` | Runner host SSH timeout in seconds | `5` |
 
 Set only one of `MIGRATE_PROJECT` and `MIGRATE_GROUP`.
+Exclusions are applied after that inclusion filter, so an explicitly excluded
+project or group always remains excluded.
 
 Registry operations additionally use `SOURCE_REGISTRY`, `SOURCE_REGISTRY_USER`, `SOURCE_REGISTRY_TOKEN`, `DEST_REGISTRY`, `DEST_REGISTRY_USER`, and `DEST_REGISTRY_TOKEN`.
 

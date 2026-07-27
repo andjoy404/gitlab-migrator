@@ -24,6 +24,7 @@ from gitlab_migrator.config import (
 )
 from gitlab_migrator.gitlab_api import GitLabAPI
 from gitlab_migrator.paths import output_path
+from gitlab_migrator.project_filters import apply_project_exclusions
 
 
 RESULTS_FILE = output_path("merge_request_migration_results.json")
@@ -92,8 +93,8 @@ def filter_projects(projects):
         ]
         if not filtered:
             raise RuntimeError(f"Project not found: {project_filter}")
-        return filtered
-    if group_filter:
+        projects = filtered
+    elif group_filter:
         normalized = group_filter.strip("/")
         source_root = SOURCE_GROUP.strip("/")
         if normalized != source_root and not normalized.startswith(source_root + "/"):
@@ -107,7 +108,13 @@ def filter_projects(projects):
         ]
         if not filtered:
             raise RuntimeError(f"No projects found below: {group_filter}")
-        return filtered
+        projects = filtered
+
+    projects, excluded = apply_project_exclusions(projects, SOURCE_GROUP)
+    for project in excluded:
+        print(f"{project['path_with_namespace']} - skipped (excluded)")
+    if excluded:
+        print(f"Excluded {len(excluded)} projects.")
     return projects
 
 

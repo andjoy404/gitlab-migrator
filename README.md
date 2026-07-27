@@ -42,6 +42,13 @@ DEST_TOKEN=replace-with-destination-token
 DEST_ROOT_GROUP=destination-group
 ```
 
+Optionally exclude exact projects or complete group subtrees:
+
+```dotenv
+EXCLUDE_PROJECTS=source-group/legacy/app,source-group/archive/test
+EXCLUDE_GROUPS=source-group/archive,source-group/deprecated
+```
+
 Review the detected endpoints and start:
 
 ```bash

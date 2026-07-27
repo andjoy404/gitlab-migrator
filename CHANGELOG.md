@@ -7,6 +7,13 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-07-28
+
+### Added
+
+- Add comma-separated `EXCLUDE_PROJECTS` and recursive `EXCLUDE_GROUPS`
+  filters for repository and merge-request migration.
+
 ## [0.5.1] - 2026-07-27
 
 ### Added

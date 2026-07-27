@@ -39,6 +39,19 @@ MIGRATE_PROJECT=
 MIGRATE_GROUP=source-group/team
 ```
 
+Exclude individual projects, entire group subtrees, or both:
+
+```dotenv
+EXCLUDE_PROJECTS=source-group/legacy/app,source-group/archive/test
+EXCLUDE_GROUPS=source-group/archive,source-group/deprecated
+```
+
+Values must be full source paths below `SOURCE_GROUP` and may be separated by
+commas and optional whitespace. An excluded group includes all nested
+subgroups and projects. Matching respects path boundaries, so excluding
+`source-group/archive` does not exclude `source-group/archive-new`.
+Exclusions take precedence over `MIGRATE_PROJECT` and `MIGRATE_GROUP`.
+
 Increase `MIGRATE_WORKERS` cautiously; Git operations, GitLab rate limits, and destination capacity usually determine a safe value.
 
 ## Merge requests only
