@@ -51,6 +51,11 @@ EXCLUDE_GROUPS=source-group/archive,source-group/deprecated
 
 `MIGRATE_PROJECT` and `MIGRATE_GROUP` accept a full source path, a path below
 `SOURCE_GROUP`, or the equivalent destination-root path.
+Use comma-separated `MIGRATE_GROUPS` to refresh several group subtrees:
+
+```dotenv
+MIGRATE_GROUPS=appfuxion/erp,appfuxion/platform,appfuxion/mobile
+```
 
 Review the detected endpoints and start:
 

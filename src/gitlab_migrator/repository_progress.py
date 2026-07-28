@@ -7,6 +7,17 @@ from pathlib import Path
 FORMAT_VERSION = 1
 
 
+def upsert_repository_result(results, result):
+    """Replace the prior record for a source path and return the new list."""
+
+    source_path = result.get("source_path")
+    return [
+        existing
+        for existing in results
+        if existing.get("source_path") != source_path
+    ] + [result]
+
+
 def load_repository_progress(path, context, reset=False):
     """Load completed repository records and validate their migration context."""
 

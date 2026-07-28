@@ -27,6 +27,8 @@ from gitlab_migrator.paths import output_path
 from gitlab_migrator.project_filters import (
     apply_project_exclusions,
     normalize_filter_path,
+    normalize_filter_paths,
+    select_group_projects,
 )
 
 
@@ -87,8 +89,20 @@ def destination_path(source_path):
 def filter_projects(projects):
     project_filter = os.getenv("MIGRATE_PROJECT")
     group_filter = os.getenv("MIGRATE_GROUP")
-    if project_filter and group_filter:
-        raise RuntimeError("Set only one of MIGRATE_PROJECT or MIGRATE_GROUP.")
+    group_filters = os.getenv("MIGRATE_GROUPS")
+    configured_filters = [
+        name for name, value in (
+            ("MIGRATE_PROJECT", project_filter),
+            ("MIGRATE_GROUP", group_filter),
+            ("MIGRATE_GROUPS", group_filters),
+        )
+        if value
+    ]
+    if len(configured_filters) > 1:
+        raise RuntimeError(
+            "Set only one of MIGRATE_PROJECT, MIGRATE_GROUP, or "
+            "MIGRATE_GROUPS."
+        )
     if project_filter:
         requested_filter = project_filter
         project_filter = normalize_filter_path(
@@ -128,6 +142,24 @@ def filter_projects(projects):
                 f"Resolved group filter: "
                 f"{requested_filter} -> {normalized}"
             )
+        projects = filtered
+    elif group_filters:
+        normalized_groups = normalize_filter_paths(
+            group_filters, SOURCE_GROUP, DEST_ROOT_GROUP
+        )
+        if not normalized_groups:
+            raise RuntimeError(
+                "MIGRATE_GROUPS must contain at least one group."
+            )
+        filtered = select_group_projects(projects, normalized_groups)
+        if not filtered:
+            raise RuntimeError(
+                "No projects found below MIGRATE_GROUPS: "
+                + ", ".join(sorted(normalized_groups))
+            )
+        print("Migrating merge requests for selected groups:")
+        for selected_group in sorted(normalized_groups):
+            print(f"  - {selected_group}")
         projects = filtered
 
     projects, excluded = apply_project_exclusions(projects, SOURCE_GROUP)

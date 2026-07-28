@@ -3,6 +3,16 @@
 import os
 
 
+def comma_separated_values(value):
+    """Return normalized, unique paths from a comma-separated string."""
+
+    return {
+        item.strip().strip("/")
+        for item in (value or "").split(",")
+        if item.strip().strip("/")
+    }
+
+
 def normalize_filter_path(value, source_group, destination_root=None):
     """Resolve source, destination-root, or source-relative filter paths."""
 
@@ -23,14 +33,45 @@ def normalize_filter_path(value, source_group, destination_root=None):
     return source_root + "/" + normalized
 
 
+def normalize_filter_paths(value, source_group, destination_root=None):
+    """Normalize every path in a comma-separated filter value."""
+
+    return {
+        normalize_filter_path(path, source_group, destination_root)
+        for path in comma_separated_values(value)
+    }
+
+
+def select_group_projects(projects, group_paths):
+    """Return projects that belong to any selected group subtree."""
+
+    return [
+        project
+        for project in projects
+        if any(
+            project["path_with_namespace"] == group
+            or project["path_with_namespace"].startswith(group + "/")
+            for group in group_paths
+        )
+    ]
+
+
+def remove_completed_projects(projects, completed_paths, refresh=False):
+    """Skip checkpoints unless an explicit scope requests a fresh sync."""
+
+    if refresh:
+        return projects
+    return [
+        project
+        for project in projects
+        if project["path_with_namespace"] not in completed_paths
+    ]
+
+
 def comma_separated_paths(name):
     """Return normalized, unique paths from a comma-separated environment value."""
 
-    return {
-        value.strip().strip("/")
-        for value in os.getenv(name, "").split(",")
-        if value.strip().strip("/")
-    }
+    return comma_separated_values(os.getenv(name, ""))
 
 
 def validate_exclusions(source_group, excluded_projects, excluded_groups):

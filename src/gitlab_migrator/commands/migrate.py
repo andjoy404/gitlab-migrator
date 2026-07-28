@@ -25,10 +25,14 @@ from gitlab_migrator.paths import output_path
 from gitlab_migrator.project_filters import (
     apply_project_exclusions,
     normalize_filter_path,
+    normalize_filter_paths,
+    remove_completed_projects,
+    select_group_projects,
 )
 from gitlab_migrator.repository_progress import (
     load_repository_progress,
     save_repository_progress,
+    upsert_repository_result,
 )
 
 from gitlab_migrator.migrate_protected_branches import (
@@ -126,10 +130,19 @@ projects = src.list_projects(
 # destination namespace hierarchy is preserved.
 project_filter = os.getenv("MIGRATE_PROJECT")
 group_filter = os.getenv("MIGRATE_GROUP")
+group_filters = os.getenv("MIGRATE_GROUPS")
 
-if project_filter and group_filter:
+configured_filters = [
+    name for name, value in (
+        ("MIGRATE_PROJECT", project_filter),
+        ("MIGRATE_GROUP", group_filter),
+        ("MIGRATE_GROUPS", group_filters),
+    )
+    if value
+]
+if len(configured_filters) > 1:
     raise RuntimeError(
-        "Set only one of MIGRATE_PROJECT or MIGRATE_GROUP."
+        "Set only one of MIGRATE_PROJECT, MIGRATE_GROUP, or MIGRATE_GROUPS."
     )
 
 if project_filter:
@@ -184,6 +197,22 @@ elif group_filter:
         print(f"Resolved group filter: {requested_filter} -> {group_filter}")
     print(f"Syncing only group: {group_filter}")
 
+elif group_filters:
+    normalized_groups = normalize_filter_paths(
+        group_filters, SOURCE_GROUP, DEST_ROOT_GROUP
+    )
+    if not normalized_groups:
+        raise RuntimeError("MIGRATE_GROUPS must contain at least one group.")
+    projects = select_group_projects(projects, normalized_groups)
+    if not projects:
+        raise RuntimeError(
+            "No projects found below MIGRATE_GROUPS: "
+            + ", ".join(sorted(normalized_groups))
+        )
+    print("Syncing selected groups:")
+    for selected_group in sorted(normalized_groups):
+        print(f"  - {selected_group}")
+
 projects, excluded_projects = apply_project_exclusions(projects, SOURCE_GROUP)
 for project in excluded_projects:
     print(f"{project['path_with_namespace']} - skipped (excluded)")
@@ -191,15 +220,16 @@ if excluded_projects:
     print(f"Excluded {len(excluded_projects)} projects.")
 
 discovered_total = len(projects)
-projects = [
-    project
-    for project in projects
-    if project["path_with_namespace"] not in completed_paths
-]
+refresh_selected = bool(configured_filters)
+projects = remove_completed_projects(
+    projects, completed_paths, refresh=refresh_selected
+)
 previously_completed = discovered_total - len(projects)
 total = len(projects)
 
 print(f"Found {discovered_total} projects.")
+if refresh_selected:
+    print("Explicit migration filter selected; refreshing repository history.")
 if previously_completed:
     print(
         f"Skipping {previously_completed} previously completed repositories "
@@ -271,12 +301,15 @@ def migrate_project(index, project):
             )
 
         with results_lock:
-            repository_results.append({
+            updated_result = {
                 "source_path": project["path_with_namespace"],
                 "destination_path": destination_path,
                 "status": "completed",
                 "completed_at": datetime.now(timezone.utc).isoformat(),
-            })
+            }
+            repository_results[:] = upsert_repository_result(
+                repository_results, updated_result
+            )
             save_repository_progress(
                 results_file,
                 migration_context,

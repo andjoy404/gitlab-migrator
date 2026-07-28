@@ -7,6 +7,20 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-07-28
+
+### Added
+
+- Add comma-separated `MIGRATE_GROUPS` for selecting multiple source group
+  subtrees in repository and merge-request migration.
+
+### Fixed
+
+- Refresh repository history when an explicit project or group filter is
+  selected instead of skipping repositories with completion checkpoints.
+- Replace prior repository checkpoint records during a scoped refresh instead
+  of appending duplicate completion entries.
+
 ## [0.6.1] - 2026-07-28
 
 ### Fixed

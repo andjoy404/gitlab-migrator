@@ -39,6 +39,14 @@ MIGRATE_PROJECT=
 MIGRATE_GROUP=source-group/team
 ```
 
+Select multiple group subtrees with:
+
+```dotenv
+MIGRATE_PROJECT=
+MIGRATE_GROUP=
+MIGRATE_GROUPS=source-group/erp,source-group/platform,source-group/mobile
+```
+
 Both filters accept the full source path, a path relative to `SOURCE_GROUP`,
 or the equivalent path below `DEST_ROOT_GROUP`. For example, with
 `SOURCE_GROUP=appfuxion-my` and `DEST_ROOT_GROUP=appfuxion`, all three select
@@ -52,6 +60,11 @@ MIGRATE_PROJECT=appfuxion/erp/afx_erp
 
 Set only one of those example lines at a time.
 
+An explicit `MIGRATE_PROJECT`, `MIGRATE_GROUP`, or `MIGRATE_GROUPS` selection
+always refreshes matching repository history, even when a prior completion
+checkpoint exists. An unfiltered migration continues to skip completed
+repositories so interrupted full migrations remain resumable.
+
 Exclude individual projects, entire group subtrees, or both:
 
 ```dotenv
@@ -63,7 +76,7 @@ Values must be full source paths below `SOURCE_GROUP` and may be separated by
 commas and optional whitespace. An excluded group includes all nested
 subgroups and projects. Matching respects path boundaries, so excluding
 `source-group/archive` does not exclude `source-group/archive-new`.
-Exclusions take precedence over `MIGRATE_PROJECT` and `MIGRATE_GROUP`.
+Exclusions take precedence over all migration inclusion filters.
 
 Increase `MIGRATE_WORKERS` cautiously; Git operations, GitLab rate limits, and destination capacity usually determine a safe value.
 

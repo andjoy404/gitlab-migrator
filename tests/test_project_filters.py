@@ -5,6 +5,9 @@ from unittest.mock import patch
 from gitlab_migrator.project_filters import (
     apply_project_exclusions,
     normalize_filter_path,
+    normalize_filter_paths,
+    remove_completed_projects,
+    select_group_projects,
 )
 
 
@@ -13,6 +16,41 @@ def project(path):
 
 
 class ProjectFilterTests(unittest.TestCase):
+    def test_multiple_groups_accept_mixed_path_forms(self):
+        groups = normalize_filter_paths(
+            "appfuxion/erp, platform, appfuxion-my/mobile",
+            "appfuxion-my",
+            "appfuxion",
+        )
+        self.assertEqual(groups, {
+            "appfuxion-my/erp",
+            "appfuxion-my/platform",
+            "appfuxion-my/mobile",
+        })
+        projects = [
+            project("appfuxion-my/erp/api"),
+            project("appfuxion-my/erp-new/keep"),
+            project("appfuxion-my/mobile/app"),
+            project("appfuxion-my/other/keep"),
+        ]
+        self.assertEqual(
+            [
+                item["path_with_namespace"]
+                for item in select_group_projects(projects, groups)
+            ],
+            ["appfuxion-my/erp/api", "appfuxion-my/mobile/app"],
+        )
+
+    def test_explicit_scope_refreshes_completed_projects(self):
+        projects = [project("source-group/team/app")]
+        completed = {"source-group/team/app"}
+
+        self.assertEqual(remove_completed_projects(projects, completed), [])
+        self.assertEqual(
+            remove_completed_projects(projects, completed, refresh=True),
+            projects,
+        )
+
     def test_filter_paths_accept_source_destination_and_relative_forms(self):
         cases = {
             "appfuxion-my/erp/afx_erp": "appfuxion-my/erp/afx_erp",
