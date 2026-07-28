@@ -2,7 +2,10 @@ import os
 import unittest
 from unittest.mock import patch
 
-from gitlab_migrator.project_filters import apply_project_exclusions
+from gitlab_migrator.project_filters import (
+    apply_project_exclusions,
+    normalize_filter_path,
+)
 
 
 def project(path):
@@ -10,6 +13,21 @@ def project(path):
 
 
 class ProjectFilterTests(unittest.TestCase):
+    def test_filter_paths_accept_source_destination_and_relative_forms(self):
+        cases = {
+            "appfuxion-my/erp/afx_erp": "appfuxion-my/erp/afx_erp",
+            "appfuxion/erp/afx_erp": "appfuxion-my/erp/afx_erp",
+            "erp/afx_erp": "appfuxion-my/erp/afx_erp",
+        }
+        for value, expected in cases.items():
+            with self.subTest(value=value):
+                self.assertEqual(
+                    normalize_filter_path(
+                        value, "appfuxion-my", "appfuxion"
+                    ),
+                    expected,
+                )
+
     def test_exact_projects_and_group_subtrees_are_excluded(self):
         projects = [
             project("source-group/legacy/app"),

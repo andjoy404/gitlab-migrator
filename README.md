@@ -49,6 +49,9 @@ EXCLUDE_PROJECTS=source-group/legacy/app,source-group/archive/test
 EXCLUDE_GROUPS=source-group/archive,source-group/deprecated
 ```
 
+`MIGRATE_PROJECT` and `MIGRATE_GROUP` accept a full source path, a path below
+`SOURCE_GROUP`, or the equivalent destination-root path.
+
 Review the detected endpoints and start:
 
 ```bash

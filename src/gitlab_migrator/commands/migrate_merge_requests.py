@@ -24,7 +24,10 @@ from gitlab_migrator.config import (
 )
 from gitlab_migrator.gitlab_api import GitLabAPI
 from gitlab_migrator.paths import output_path
-from gitlab_migrator.project_filters import apply_project_exclusions
+from gitlab_migrator.project_filters import (
+    apply_project_exclusions,
+    normalize_filter_path,
+)
 
 
 RESULTS_FILE = output_path("merge_request_migration_results.json")
@@ -87,15 +90,27 @@ def filter_projects(projects):
     if project_filter and group_filter:
         raise RuntimeError("Set only one of MIGRATE_PROJECT or MIGRATE_GROUP.")
     if project_filter:
+        requested_filter = project_filter
+        project_filter = normalize_filter_path(
+            project_filter, SOURCE_GROUP, DEST_ROOT_GROUP
+        )
         filtered = [
             project for project in projects
             if project["path_with_namespace"] == project_filter
         ]
         if not filtered:
             raise RuntimeError(f"Project not found: {project_filter}")
+        if requested_filter.strip("/") != project_filter:
+            print(
+                f"Resolved project filter: "
+                f"{requested_filter} -> {project_filter}"
+            )
         projects = filtered
     elif group_filter:
-        normalized = group_filter.strip("/")
+        requested_filter = group_filter
+        normalized = normalize_filter_path(
+            group_filter, SOURCE_GROUP, DEST_ROOT_GROUP
+        )
         source_root = SOURCE_GROUP.strip("/")
         if normalized != source_root and not normalized.startswith(source_root + "/"):
             raise RuntimeError(
@@ -108,6 +123,11 @@ def filter_projects(projects):
         ]
         if not filtered:
             raise RuntimeError(f"No projects found below: {group_filter}")
+        if requested_filter.strip("/") != normalized:
+            print(
+                f"Resolved group filter: "
+                f"{requested_filter} -> {normalized}"
+            )
         projects = filtered
 
     projects, excluded = apply_project_exclusions(projects, SOURCE_GROUP)

@@ -22,7 +22,10 @@ from gitlab_migrator.gitlab_api import GitLabAPI
 from gitlab_migrator.namespace import NamespaceManager
 from gitlab_migrator.mirror import mirror
 from gitlab_migrator.paths import output_path
-from gitlab_migrator.project_filters import apply_project_exclusions
+from gitlab_migrator.project_filters import (
+    apply_project_exclusions,
+    normalize_filter_path,
+)
 from gitlab_migrator.repository_progress import (
     load_repository_progress,
     save_repository_progress,
@@ -130,6 +133,10 @@ if project_filter and group_filter:
     )
 
 if project_filter:
+    requested_filter = project_filter
+    project_filter = normalize_filter_path(
+        project_filter, SOURCE_GROUP, DEST_ROOT_GROUP
+    )
     projects = [
         project
         for project in projects
@@ -141,10 +148,15 @@ if project_filter:
             f"Project not found in source group: {project_filter}"
         )
 
+    if requested_filter.strip("/") != project_filter:
+        print(f"Resolved project filter: {requested_filter} -> {project_filter}")
     print(f"Retrying only: {project_filter}")
 
 elif group_filter:
-    group_filter = group_filter.strip("/")
+    requested_filter = group_filter
+    group_filter = normalize_filter_path(
+        group_filter, SOURCE_GROUP, DEST_ROOT_GROUP
+    )
     source_root = SOURCE_GROUP.strip("/")
 
     if (
@@ -168,6 +180,8 @@ elif group_filter:
             f"No projects found in source group: {group_filter}"
         )
 
+    if requested_filter.strip("/") != group_filter:
+        print(f"Resolved group filter: {requested_filter} -> {group_filter}")
     print(f"Syncing only group: {group_filter}")
 
 projects, excluded_projects = apply_project_exclusions(projects, SOURCE_GROUP)

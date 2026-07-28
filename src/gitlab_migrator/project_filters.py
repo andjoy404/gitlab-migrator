@@ -3,6 +3,26 @@
 import os
 
 
+def normalize_filter_path(value, source_group, destination_root=None):
+    """Resolve source, destination-root, or source-relative filter paths."""
+
+    normalized = (value or "").strip().strip("/")
+    if not normalized:
+        return ""
+
+    source_root = source_group.strip("/")
+    destination_root = (destination_root or "").strip("/")
+    if normalized == source_root or normalized.startswith(source_root + "/"):
+        return normalized
+    if destination_root and (
+        normalized == destination_root
+        or normalized.startswith(destination_root + "/")
+    ):
+        relative = normalized.removeprefix(destination_root).strip("/")
+        return "/".join(part for part in (source_root, relative) if part)
+    return source_root + "/" + normalized
+
+
 def comma_separated_paths(name):
     """Return normalized, unique paths from a comma-separated environment value."""
 

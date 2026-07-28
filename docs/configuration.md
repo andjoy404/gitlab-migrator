@@ -36,6 +36,22 @@ Set only one of `MIGRATE_PROJECT` and `MIGRATE_GROUP`.
 Exclusions are applied after that inclusion filter, so an explicitly excluded
 project or group always remains excluded.
 
+Migration inclusion filters accept any of these equivalent forms:
+
+```dotenv
+# Full source path
+MIGRATE_PROJECT=appfuxion-my/erp/afx_erp
+
+# Path relative to SOURCE_GROUP
+MIGRATE_PROJECT=erp/afx_erp
+
+# Equivalent path below DEST_ROOT_GROUP
+MIGRATE_PROJECT=appfuxion/erp/afx_erp
+```
+
+The CLI resolves relative and destination-root forms to the full source path
+before selecting projects. The same forms are accepted by `MIGRATE_GROUP`.
+
 Registry operations additionally use `SOURCE_REGISTRY`, `SOURCE_REGISTRY_USER`, `SOURCE_REGISTRY_TOKEN`, `DEST_REGISTRY`, `DEST_REGISTRY_USER`, and `DEST_REGISTRY_TOKEN`.
 
 ## Custom locations

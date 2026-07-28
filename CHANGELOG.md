@@ -7,6 +7,13 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-07-28
+
+### Fixed
+
+- Accept full source, source-relative, and destination-root paths in
+  `MIGRATE_PROJECT` and `MIGRATE_GROUP`.
+
 ## [0.6.0] - 2026-07-28
 
 ### Added

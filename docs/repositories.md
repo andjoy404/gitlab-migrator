@@ -39,6 +39,19 @@ MIGRATE_PROJECT=
 MIGRATE_GROUP=source-group/team
 ```
 
+Both filters accept the full source path, a path relative to `SOURCE_GROUP`,
+or the equivalent path below `DEST_ROOT_GROUP`. For example, with
+`SOURCE_GROUP=appfuxion-my` and `DEST_ROOT_GROUP=appfuxion`, all three select
+the same project:
+
+```dotenv
+MIGRATE_PROJECT=appfuxion-my/erp/afx_erp
+MIGRATE_PROJECT=erp/afx_erp
+MIGRATE_PROJECT=appfuxion/erp/afx_erp
+```
+
+Set only one of those example lines at a time.
+
 Exclude individual projects, entire group subtrees, or both:
 
 ```dotenv
