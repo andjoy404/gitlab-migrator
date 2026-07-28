@@ -49,6 +49,7 @@ EXCLUDE_PROJECTS=source-group/legacy/app,source-group/archive/test
 EXCLUDE_GROUPS=source-group/archive,source-group/deprecated
 ```
 
+Exclusions accept source-root, destination-root, and source-relative paths.
 `MIGRATE_PROJECT` and `MIGRATE_GROUP` accept a full source path, a path below
 `SOURCE_GROUP`, or the equivalent destination-root path.
 Use comma-separated `MIGRATE_GROUPS` to refresh several group subtrees:

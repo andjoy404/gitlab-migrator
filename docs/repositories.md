@@ -72,9 +72,10 @@ EXCLUDE_PROJECTS=source-group/legacy/app,source-group/archive/test
 EXCLUDE_GROUPS=source-group/archive,source-group/deprecated
 ```
 
-Values must be full source paths below `SOURCE_GROUP` and may be separated by
-commas and optional whitespace. An excluded group includes all nested
-subgroups and projects. Matching respects path boundaries, so excluding
+Exclusions accept full source paths, paths relative to `SOURCE_GROUP`, and
+equivalent paths below `DEST_ROOT_GROUP`. Values may be separated by commas
+and optional whitespace. An excluded group includes all nested subgroups and
+projects. Matching respects path boundaries, so excluding
 `source-group/archive` does not exclude `source-group/archive-new`.
 Exclusions take precedence over all migration inclusion filters.
 

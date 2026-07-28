@@ -49,7 +49,7 @@ def draw_terminal_line(draw, position, kind, text):
             ("│  ", "#e879f9"),
             ("GitLab", "#fc6d26"),
             (" Migrator", "#67e8f9"),
-            ("  v0.7.0", "#4ade80"),
+            ("  v0.7.1", "#4ade80"),
             ("                                           │", "#e879f9"),
         ])
     elif kind == "banner_caps":
@@ -120,7 +120,7 @@ def main():
                 ("banner_title", ""),
                 ("banner_caps", ""),
                 ("banner_border", "╰────────────────────────────────────────────────────────────────────╯"),
-                ("muted", "gitlab-migrator 0.7.0"),
+                ("muted", "gitlab-migrator 0.7.1"),
             ],
         ),
         ("$ gitlab-migrator migrate all", "Continue migration? (yes/no):"),

@@ -162,7 +162,9 @@ def filter_projects(projects):
             print(f"  - {selected_group}")
         projects = filtered
 
-    projects, excluded = apply_project_exclusions(projects, SOURCE_GROUP)
+    projects, excluded = apply_project_exclusions(
+        projects, SOURCE_GROUP, DEST_ROOT_GROUP
+    )
     for project in excluded:
         print(f"{project['path_with_namespace']} - skipped (excluded)")
     if excluded:

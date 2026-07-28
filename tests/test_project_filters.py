@@ -103,16 +103,35 @@ class ProjectFilterTests(unittest.TestCase):
             ],
         )
 
-    def test_exclusions_outside_source_group_are_rejected(self):
+    def test_exclusions_accept_destination_and_relative_paths(self):
+        projects = [
+            project("appfuxion-my/erp/api"),
+            project("appfuxion-my/archive/test"),
+            project("appfuxion-my/platform/keep"),
+        ]
         with patch.dict(
             os.environ,
-            {"EXCLUDE_GROUPS": "another-group/archive"},
+            {
+                "EXCLUDE_GROUPS": "appfuxion/erp",
+                "EXCLUDE_PROJECTS": "archive/test",
+            },
             clear=True,
         ):
-            with self.assertRaisesRegex(
-                RuntimeError, "must be SOURCE_GROUP"
-            ):
-                apply_project_exclusions([], "source-group")
+            included, excluded = apply_project_exclusions(
+                projects, "appfuxion-my", "appfuxion"
+            )
+
+        self.assertEqual(
+            [item["path_with_namespace"] for item in included],
+            ["appfuxion-my/platform/keep"],
+        )
+        self.assertEqual(
+            [item["path_with_namespace"] for item in excluded],
+            [
+                "appfuxion-my/erp/api",
+                "appfuxion-my/archive/test",
+            ],
+        )
 
 
 if __name__ == "__main__":

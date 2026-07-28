@@ -7,6 +7,13 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-07-29
+
+### Fixed
+
+- Accept full source, source-relative, and destination-root paths in
+  `EXCLUDE_PROJECTS` and `EXCLUDE_GROUPS`.
+
 ## [0.7.0] - 2026-07-28
 
 ### Added

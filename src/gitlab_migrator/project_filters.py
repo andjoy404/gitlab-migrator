@@ -68,12 +68,6 @@ def remove_completed_projects(projects, completed_paths, refresh=False):
     ]
 
 
-def comma_separated_paths(name):
-    """Return normalized, unique paths from a comma-separated environment value."""
-
-    return comma_separated_values(os.getenv(name, ""))
-
-
 def validate_exclusions(source_group, excluded_projects, excluded_groups):
     """Reject exclusions outside the configured source group."""
 
@@ -96,11 +90,17 @@ def validate_exclusions(source_group, excluded_projects, excluded_groups):
         )
 
 
-def apply_project_exclusions(projects, source_group):
+def apply_project_exclusions(
+    projects, source_group, destination_root=None
+):
     """Exclude exact projects and every project below excluded group subtrees."""
 
-    excluded_projects = comma_separated_paths("EXCLUDE_PROJECTS")
-    excluded_groups = comma_separated_paths("EXCLUDE_GROUPS")
+    excluded_projects = normalize_filter_paths(
+        os.getenv("EXCLUDE_PROJECTS"), source_group, destination_root
+    )
+    excluded_groups = normalize_filter_paths(
+        os.getenv("EXCLUDE_GROUPS"), source_group, destination_root
+    )
     validate_exclusions(source_group, excluded_projects, excluded_groups)
 
     included = []

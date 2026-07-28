@@ -213,7 +213,9 @@ elif group_filters:
     for selected_group in sorted(normalized_groups):
         print(f"  - {selected_group}")
 
-projects, excluded_projects = apply_project_exclusions(projects, SOURCE_GROUP)
+projects, excluded_projects = apply_project_exclusions(
+    projects, SOURCE_GROUP, DEST_ROOT_GROUP
+)
 for project in excluded_projects:
     print(f"{project['path_with_namespace']} - skipped (excluded)")
 if excluded_projects:

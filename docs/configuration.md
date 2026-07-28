@@ -53,6 +53,7 @@ MIGRATE_PROJECT=appfuxion/erp/afx_erp
 The CLI resolves relative and destination-root forms to the full source path
 before selecting projects. The same forms are accepted by `MIGRATE_GROUP` and
 each comma-separated entry in `MIGRATE_GROUPS`.
+`EXCLUDE_PROJECTS` and `EXCLUDE_GROUPS` accept these three path forms as well.
 
 Registry operations additionally use `SOURCE_REGISTRY`, `SOURCE_REGISTRY_USER`, `SOURCE_REGISTRY_TOKEN`, `DEST_REGISTRY`, `DEST_REGISTRY_USER`, and `DEST_REGISTRY_TOKEN`.
 
